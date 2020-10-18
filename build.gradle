@@ -36,3 +36,7 @@ tasks.named('test') {
     // Use junit platform for unit tests.
     useJUnitPlatform()
 }
+
+sourceSets {
+    sourceSets.main.output.resourcesDir = sourceSets.main.java.outputDir
+}
