@@ -10,6 +10,7 @@ IntelliJ Items
 # build artifacts
 .gradle/
 bin/
+build/
 out/
 
 # program execution artifacts
