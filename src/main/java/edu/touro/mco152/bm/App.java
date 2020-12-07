@@ -138,27 +138,27 @@ public class App {
         value = p.getProperty("locationDir", System.getProperty("user.home"));
         locationDir = new File(value);
         value = p.getProperty("multiFile", String.valueOf(multiFile));
-        multiFile = Boolean.valueOf(value);
+        multiFile = Boolean.parseBoolean(value);
         value = p.getProperty("autoRemoveData", String.valueOf(autoRemoveData));
-        autoRemoveData = Boolean.valueOf(value);
+        autoRemoveData = Boolean.parseBoolean(value);
         value = p.getProperty("autoReset", String.valueOf(autoReset));
-        autoReset = Boolean.valueOf(value);
+        autoReset = Boolean.parseBoolean(value);
         value = p.getProperty("blockSequence", String.valueOf(blockSequence));
         blockSequence = DiskRun.BlockSequence.valueOf(value);
         value = p.getProperty("showMaxMin", String.valueOf(showMaxMin));
-        showMaxMin = Boolean.valueOf(value);
+        showMaxMin = Boolean.parseBoolean(value);
         value = p.getProperty("numOfFiles", String.valueOf(numOfMarks));
-        numOfMarks = Integer.valueOf(value);
+        numOfMarks = Integer.parseInt(value);
         value = p.getProperty("numOfBlocks", String.valueOf(numOfBlocks));
-        numOfBlocks = Integer.valueOf(value);
+        numOfBlocks = Integer.parseInt(value);
         value = p.getProperty("blockSizeKb", String.valueOf(blockSizeKb));
-        blockSizeKb = Integer.valueOf(value);
+        blockSizeKb = Integer.parseInt(value);
         value = p.getProperty("writeTest", String.valueOf(writeTest));
-        writeTest = Boolean.valueOf(value);
+        writeTest = Boolean.parseBoolean(value);
         value = p.getProperty("readTest", String.valueOf(readTest));
-        readTest = Boolean.valueOf(value);
+        readTest = Boolean.parseBoolean(value);
         value = p.getProperty("writeSyncEnable", String.valueOf(writeSyncEnable));
-        writeSyncEnable = Boolean.valueOf(value);
+        writeSyncEnable = Boolean.parseBoolean(value);
     }
 
     public static void saveConfig() {
