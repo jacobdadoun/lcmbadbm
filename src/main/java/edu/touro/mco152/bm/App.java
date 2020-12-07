@@ -14,7 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Primary class for global variables and common methods.
+ * The App class is responsible for loading, saving, and in general, initializing the application.
+ * It is Called by SWING in the context of IoC.
  */
 public class App {
 
@@ -227,6 +228,10 @@ public class App {
         diskWorker.cancelDelegate(true);
     }
 
+    /**
+     * startBenchmark() gets called when we click the 'Start' button. It's responsible for updating a state for itself.
+     * It will remove existing test data which will be replaced when th benchmark is finished executing.
+     */
     public static void startBenchmark() {
 
         //1. check that there isn't already a worker in progress
@@ -265,8 +270,12 @@ public class App {
         }
 
         //7. start disk worker thread
+
+        // We then implement an object of type SwingWorker and UserInterface - in this case, GUIBenchMark extends
+        // SwingWorker and implements UserInterface.
         GUIBenchmark guiBenchmark = new GUIBenchmark();
 
+        // Gives our SwingWorker object ability to switch states on the BM
         guiBenchmark.registerPropertyChangeListener((final PropertyChangeEvent event) -> {
             switch (event.getPropertyName()) {
                 case "progress":
@@ -287,7 +296,11 @@ public class App {
             }
         });
 
+        // When we pass this object into DiskWorker, the calls made to GUIBenchMark in SwingWorker::doBMLogic
+        // will DEPEND on this object to reference its respective calls
         diskWorker = new DiskWorker(guiBenchmark);
+
+        // call to DiskWorker::executionDelegate will delegate the requests for execution to GUIBenchMark
         diskWorker.executionDelegate();
     }
 
