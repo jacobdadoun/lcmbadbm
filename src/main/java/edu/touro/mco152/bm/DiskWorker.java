@@ -29,12 +29,14 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
  * while the DiskMark class described each iteration's result, which is displayed by the UI as the benchmark run
  * progresses.
  * <p>
- * This class only knows how to do 'read' or 'write' disk benchmarks. It is instantiated by the
+ * This class only knows how to do 'read' or 'write' disk benchmarks. It is instantiated in the
  * startBenchmark() method.
  * <p>
- * To be Swing compliant this class extends SwingWorker and declares that its final return (when
- * doInBackground() is finished) is of type Boolean, and declares that intermediate results are communicated to
- * Swing using an instance of the DiskMark class.
+ * This class has one purpose, to provide instructions to run a benchmark. We instantiate this class with an object
+ * of type SwingWorker and UserInterface (GUIBenchMark), which will be used in doBMLogic to call instruction to
+ * GUIBenchMark::isBenchMarkCancelled, ::executeBenchMark, ::cancelBenchMark, ::publishToGUI and ::provideProgress.
+ * Instead of SwingWorker being dependent on DiskWorker (a class with an entirely different responsibility),
+ * DiskWorker is now dependent on SwingWorker via an instance type passed in to its constructor.
  */
 
 public class DiskWorker {
