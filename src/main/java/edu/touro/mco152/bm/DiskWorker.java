@@ -1,12 +1,13 @@
 package edu.touro.mco152.bm;
 
-import edu.touro.mco152.bm.command.BMActionCommandCenter;
+import edu.touro.mco152.bm.command.BMCommandCenter;
+import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
 import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
 import edu.touro.mco152.bm.ui.Gui;
 
 import javax.swing.*;
 
-import static edu.touro.mco152.bm.App.msg;
+import static edu.touro.mco152.bm.App.*;
 
 /**
  * Run the disk benchmarking as a Swing-compliant thread (only one of these threads can run at
@@ -30,7 +31,7 @@ import static edu.touro.mco152.bm.App.msg;
 
 public class DiskWorker {
 
-    static private UserInterface userInterface;
+    private static UserInterface userInterface;
 
     public DiskWorker(UserInterface userInterface) {
         DiskWorker.userInterface = userInterface;
@@ -53,13 +54,6 @@ public class DiskWorker {
          * its (super class's) execute() method, causing Swing to eventually
          * call this doInBackground() method.
          */
-        System.out.println("*** starting new worker thread");
-        msg("Running readTest " + App.readTest + "   writeTest " + App.writeTest);
-        msg("num files: " + App.numOfMarks + ", num blks: " + App.numOfBlocks
-                + ", blk size (kb): " + App.blockSizeKb + ", blockSequence: " + App.blockSequence);
-
-
-
 
         Gui.updateLegend();  // init chart legend info
 
@@ -68,16 +62,20 @@ public class DiskWorker {
             Gui.resetTestData();
         }
 
-        /**
-         * The GUI allows either a write, read, or both types of BMs to be started. They are done serially.
-         */
-        
-        BMActionCommandCenter bmWriteActionCommandCenter = new BMWriteActionCommandCenter();
+        BMCommandCenter bmCommand;
 
-        /**
-         * Most benchmarking systems will try to do some cleanup in between 2 benchmark operations to
-         * make it more 'fair'. For example a networking benchmark might close and re-open sockets,
-         * a memory benchmark might clear or invalidate the Op Systems TLB or other caches, etc.
+        /*
+          The GUI allows either a write, read, or both types of BMs to be started. They are done serially.
+         */
+        if(App.writeTest) {
+            bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+            bmCommand.doBMCommand();
+        }
+
+        /*
+          Most benchmarking systems will try to do some cleanup in between 2 benchmark operations to
+          make it more 'fair'. For example a networking benchmark might close and re-open sockets,
+          a memory benchmark might clear or invalidate the Op Systems TLB or other caches, etc.
          */
 
         // try renaming all files to clear cache
@@ -91,12 +89,13 @@ public class DiskWorker {
                     "Clear Disk Cache Now", JOptionPane.PLAIN_MESSAGE);
         }
 
-        // Same as above, just for Read operations instead of Writes.
+        if (App.readTest) {
+            bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+            bmCommand.doBMCommand();
+        }
+
 
         App.nextMarkNumber += App.numOfMarks;
         return true;
     }
 }
-
-
-

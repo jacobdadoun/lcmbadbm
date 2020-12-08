@@ -231,6 +231,8 @@ public class App {
     /**
      * startBenchmark() gets called when we click the 'Start' button. It's responsible for updating a state for itself.
      * It will remove existing test data which will be replaced when th benchmark is finished executing.
+     *
+     * When we make a call to a class of type Command, we must pass in the BM values
      */
     public static void startBenchmark() {
 
@@ -295,6 +297,8 @@ public class App {
                     break;
             }
         });
+
+        // TODO --> new DiskWorker(readTest/writeTest, numOfMarks, numOfBlocks, blockSizeKb, blockSequence)
 
         // When we pass this object into DiskWorker, the calls made to GUIBenchMark in SwingWorker::doBMLogic
         // will DEPEND on this object to reference its respective calls

@@ -21,10 +21,29 @@ import static edu.touro.mco152.bm.App.*;
 import static edu.touro.mco152.bm.App.msg;
 import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
-public class BMWriteActionCommandCenter implements BMActionCommandCenter {
+/**
+ * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
+ */
+public class BMWriteActionCommandCenter implements BMCommandCenter {
+
+    UserInterface userInterface;
+    int numOfMarks, numOfBlocks, blockSizeKb;
+    DiskRun.BlockSequence blockSequence;
+
+    public BMWriteActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
+        this.userInterface = userInterface;
+        this.numOfMarks = numOfMarks;
+        this.numOfBlocks = numOfBlocks;
+        this.blockSizeKb = blockSizeKb;
+        this.blockSequence = blockSequence;
+    }
 
     @Override
-    public void doBMCommand(UserInterface userInterface) {
+    public void doBMCommand() {
+
+        msg("Running writeTest " + App.writeTest);
+        msg("num files: " + App.numOfMarks + ", num blks: " + App.numOfBlocks
+                + ", blk size (kb): " + App.blockSizeKb + ", blockSequence: " + App.blockSequence);
 
         /**
          * init local vars that keep track of benchmarks, and a large write buffer
@@ -49,110 +68,113 @@ public class BMWriteActionCommandCenter implements BMActionCommandCenter {
         DiskMark wMark;
         int startFileNum = App.nextMarkNumber;
 
-        if (App.writeTest) {
-            DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, App.blockSequence);
-            run.setNumMarks(App.numOfMarks);
-            run.setNumBlocks(App.numOfBlocks);
-            run.setBlockSize(App.blockSizeKb);
-            run.setTxSize(App.targetTxSizeKb());
-            run.setDiskInfo(Util.getDiskInfo(dataDir));
+        DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, App.blockSequence);
+        run.setNumMarks(App.numOfMarks);
+        run.setNumBlocks(App.numOfBlocks);
+        run.setBlockSize(App.blockSizeKb);
+        run.setTxSize(App.targetTxSizeKb());
+        run.setDiskInfo(Util.getDiskInfo(dataDir));
 
-            // Tell logger and GUI to display what we know so far about the Run
-            msg("disk info: (" + run.getDiskInfo() + ")");
+        // Tell logger and GUI to display what we know so far about the Run
+        msg("disk info: (" + run.getDiskInfo() + ")");
 
-            Gui.chartPanel.getChart().getTitle().setVisible(true);
-            Gui.chartPanel.getChart().getTitle().setText(run.getDiskInfo());
+        Gui.chartPanel.getChart().getTitle().setVisible(true);
+        Gui.chartPanel.getChart().getTitle().setText(run.getDiskInfo());
 
-            // Create a test data file using the default file system and config-specified location
-            if (!App.multiFile) {
-                testFile = new File(dataDir.getAbsolutePath() + File.separator + "testdata.jdm");
-            }
+        // Create a test data file using the default file system and config-specified location
+        if (!App.multiFile) {
+            testFile = new File(dataDir.getAbsolutePath() + File.separator + "testdata.jdm");
+        }
 
             /*
               Begin an outer loop for specified duration (number of 'marks') of benchmark,
               that keeps writing data (in its own loop - for specified # of blocks). Each 'Mark' is timed
               and is reported to the GUI for display as each Mark completes.
              */
-            for (int m = startFileNum; m < startFileNum + App.numOfMarks && !userInterface.isBenchMarkCancelled(); m++) {
+        for (int m = startFileNum; m < startFileNum + App.numOfMarks && !userInterface.isBenchMarkCancelled(); m++) {
 
-                if (App.multiFile) {
-                    testFile = new File(dataDir.getAbsolutePath()
-                            + File.separator + "testdata" + m + ".jdm");
-                }
-                wMark = new DiskMark(WRITE);    // starting to keep track of a new bench Mark
-                wMark.setMarkNum(m);
-                long startTime = System.nanoTime();
-                long totalBytesWrittenInMark = 0;
+            if (App.multiFile) {
+                testFile = new File(dataDir.getAbsolutePath()
+                        + File.separator + "testdata" + m + ".jdm");
+            }
+            wMark = new DiskMark(WRITE);    // starting to keep track of a new bench Mark
+            wMark.setMarkNum(m);
+            long startTime = System.nanoTime();
+            long totalBytesWrittenInMark = 0;
 
-                String mode = "rw";
-                if (App.writeSyncEnable) {
-                    mode = "rwd";
-                }
+            String mode = "rw";
+            if (App.writeSyncEnable) {
+                mode = "rwd";
+            }
 
-                try {
-                    try (RandomAccessFile rAccFile = new RandomAccessFile(testFile, mode)) {
-                        for (int b = 0; b < numOfBlocks; b++) {
-                            if (App.blockSequence == DiskRun.BlockSequence.RANDOM) {
-                                int rLoc = Util.randInt(0, numOfBlocks - 1);
-                                rAccFile.seek(rLoc * blockSize);
-                            } else {
-                                rAccFile.seek(b * blockSize);
-                            }
-                            rAccFile.write(blockArr, 0, blockSize);
-                            totalBytesWrittenInMark += blockSize;
-                            wUnitsComplete++;
-                            unitsComplete = rUnitsComplete + wUnitsComplete;
-                            percentComplete = (float) unitsComplete / (float) unitsTotal * 100f;
+            try {
+                try (RandomAccessFile rAccFile = new RandomAccessFile(testFile, mode)) {
+                    for (int b = 0; b < numOfBlocks; b++) {
+                        if (App.blockSequence == DiskRun.BlockSequence.RANDOM) {
+                            int rLoc = Util.randInt(0, numOfBlocks - 1);
+                            rAccFile.seek(rLoc * blockSize);
+                        } else {
+                            rAccFile.seek(b * blockSize);
+                        }
+                        rAccFile.write(blockArr, 0, blockSize);
+                        totalBytesWrittenInMark += blockSize;
+                        wUnitsComplete++;
+                        unitsComplete = rUnitsComplete + wUnitsComplete;
+                        percentComplete = (float) unitsComplete / (float) unitsTotal * 100f;
 
                             /*
                               Report to GUI what percentage level of Entire BM (#Marks * #Blocks) is done.
                              */
-                            userInterface.provideProgress((int) percentComplete);
-                        }
+                        userInterface.provideProgress((int) percentComplete);
                     }
-                } catch (FileNotFoundException fnfEx) {
-                    Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, fnfEx);
                 }
-                catch (IOException ioEx) {
-                    Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ioEx);
-                }
+            } catch (FileNotFoundException fnfEx) {
+                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, fnfEx);
+            }
+            catch (IOException ioEx) {
+                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ioEx);
+            }
 
                 /*
                   Compute duration, throughput of this Mark's step of BM
                  */
-                long endTime = System.nanoTime();
-                long elapsedTimeNs = endTime - startTime;
-                double sec = (double) elapsedTimeNs / (double) 1000000000;
-                double mbWritten = (double) totalBytesWrittenInMark / (double) MEGABYTE;
-                wMark.setBwMbSec(mbWritten / sec);
+            long endTime = System.nanoTime();
+            long elapsedTimeNs = endTime - startTime;
+            double sec = (double) elapsedTimeNs / (double) 1000000000;
+            double mbWritten = (double) totalBytesWrittenInMark / (double) MEGABYTE;
+            wMark.setBwMbSec(mbWritten / sec);
 
-                // DiskMark::getBwMbSecAsString
-                msg("m:" + m + " write IO is " + wMark.getBwMbSecAsString() + " MB/s     "
-                        + "(" + Util.displayString(mbWritten) + "MB written in "
-                        + Util.displayString(sec) + " sec)");
-                App.updateMetrics(wMark);
+            // DiskMark::getBwMbSecAsString
+            msg("m:" + m + " write IO is " + wMark.getBwMbSecAsString() + " MB/s     "
+                    + "(" + Util.displayString(mbWritten) + "MB written in "
+                    + Util.displayString(sec) + " sec)");
+            App.updateMetrics(wMark);
 
                 /*
                   Let the GUI know the interim result described by the current Mark
                  */
-                userInterface.publishToGUI(wMark);
+            userInterface.publishToGUI(wMark);
 
-                // Keep track of statistics to be displayed and persisted after all Marks are done.
-                run.setRunMax(wMark.getCumMax());
-                run.setRunMin(wMark.getCumMin());
-                run.setRunAvg(wMark.getCumAvg());
-                run.setEndTime(new Date());
-            } // END outer loop for specified duration (number of 'marks') for WRITE bench mark
+            // Keep track of statistics to be displayed and persisted after all Marks are done.
+            run.setRunMax(wMark.getCumMax());
+            run.setRunMin(wMark.getCumMin());
+            run.setRunAvg(wMark.getCumAvg());
+            run.setEndTime(new Date());
+        } // END outer loop for specified duration (number of 'marks') for WRITE bench mark
 
             /*
               Persist info about the Write BM Run (e.g. into Derby Database) and add it to a GUI panel
              */
-            EntityManager em = EM.getEntityManager();
-            em.getTransaction().begin();
-            em.persist(run);
-            em.getTransaction().commit();
+        EntityManager em = EM.getEntityManager();
+        em.getTransaction().begin();
+        em.persist(run);
+        em.getTransaction().commit();
 
-            Gui.runPanel.addRun(run);
-        }
+        Gui.runPanel.addRun(run);
+    }
+
+    @Override
+    public void undoBMCommand() {
+
     }
 }

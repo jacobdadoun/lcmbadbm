@@ -6,15 +6,20 @@ import edu.touro.mco152.bm.ui.MainFrame;
 import java.io.File;
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 public class BMReadCommandTest {
 
+    @BeforeAll
     /**
      * Bruteforce setup of static classes/fields to allow DiskWorker to run.
      *
      * @author lcmcohen
      */
-    private void setupDefaultAsPerProperties()
-    {
+    static void setupDefaultAsPerProperties() {
         /// Do the minimum of what  App.init() would do to allow to run.
         Gui.mainFrame = new MainFrame();
         App.p = new Properties();
@@ -41,6 +46,12 @@ public class BMReadCommandTest {
         {
             App.dataDir.mkdirs(); // create data dir if not already present
         }
+    }
+
+    @Test
+    public void testExecute(){
+
+
     }
 
 }
