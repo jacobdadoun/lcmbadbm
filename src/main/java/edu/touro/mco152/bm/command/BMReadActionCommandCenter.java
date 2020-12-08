@@ -41,9 +41,9 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
     @Override
     public void doBMCommand() {
 
-        msg("Running readTest " + App.readTest);
-        msg("num files: " + App.numOfMarks + ", num blks: " + App.numOfBlocks
-                + ", blk size (kb): " + App.blockSizeKb + ", blockSequence: " + App.blockSequence);
+        msg("Running readTest " + readTest);
+        msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
+                + ", blk size (kb): " + blockSizeKb + ", blockSequence: " + blockSequence);
 
         /**
          * init local vars that keep track of benchmarks, and a large read buffer
@@ -53,8 +53,8 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
                 rUnitsComplete = 0,
                 unitsComplete;
 
-        int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
-        int rUnitsTotal = App.readTest ? numOfBlocks * numOfMarks : 0;
+        int wUnitsTotal = writeTest ? numOfBlocks * numOfMarks : 0;
+        int rUnitsTotal = readTest ? numOfBlocks * numOfMarks : 0;
         int unitsTotal = wUnitsTotal + rUnitsTotal;
         float percentComplete;
 
@@ -67,13 +67,13 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
         }
 
         DiskMark rMark;
-        int startFileNum = App.nextMarkNumber;
+        int startFileNum = nextMarkNumber;
 
-        DiskRun run = new DiskRun(DiskRun.IOMode.READ, App.blockSequence);
-        run.setNumMarks(App.numOfMarks);
-        run.setNumBlocks(App.numOfBlocks);
-        run.setBlockSize(App.blockSizeKb);
-        run.setTxSize(App.targetTxSizeKb());
+        DiskRun run = new DiskRun(DiskRun.IOMode.READ, blockSequence);
+        run.setNumMarks(numOfMarks);
+        run.setNumBlocks(numOfBlocks);
+        run.setBlockSize(blockSizeKb);
+        run.setTxSize(targetTxSizeKb());
         run.setDiskInfo(Util.getDiskInfo(dataDir));
 
         msg("disk info: (" + run.getDiskInfo() + ")");
@@ -81,7 +81,7 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
         Gui.chartPanel.getChart().getTitle().setVisible(true);
         Gui.chartPanel.getChart().getTitle().setText(run.getDiskInfo());
 
-        for (int m = startFileNum; m < startFileNum + App.numOfMarks && !userInterface.isBenchMarkCancelled(); m++) {
+        for (int m = startFileNum; m < startFileNum + numOfMarks && !userInterface.isBenchMarkCancelled(); m++) {
 
             if (App.multiFile) {
                 testFile = new File(dataDir.getAbsolutePath()
@@ -95,7 +95,7 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
             try {
                 try (RandomAccessFile rAccFile = new RandomAccessFile(testFile, "r")) {
                     for (int b = 0; b < numOfBlocks; b++) {
-                        if (App.blockSequence == DiskRun.BlockSequence.RANDOM) {
+                        if (blockSequence == DiskRun.BlockSequence.RANDOM) {
                             int rLoc = Util.randInt(0, numOfBlocks - 1);
                             rAccFile.seek(rLoc * blockSize);
                         } else {

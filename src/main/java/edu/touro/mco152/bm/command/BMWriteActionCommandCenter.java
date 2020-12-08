@@ -41,9 +41,9 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
     @Override
     public void doBMCommand() {
 
-        msg("Running writeTest " + App.writeTest);
-        msg("num files: " + App.numOfMarks + ", num blks: " + App.numOfBlocks
-                + ", blk size (kb): " + App.blockSizeKb + ", blockSequence: " + App.blockSequence);
+        msg("Running writeTest " + writeTest);
+        msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
+                + ", blk size (kb): " + blockSizeKb + ", blockSequence: " + blockSequence);
 
         /**
          * init local vars that keep track of benchmarks, and a large write buffer
@@ -52,8 +52,8 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
                 rUnitsComplete = 0,
                 unitsComplete;
 
-        int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
-        int rUnitsTotal = App.readTest ? numOfBlocks * numOfMarks : 0;
+        int wUnitsTotal = writeTest ? numOfBlocks * numOfMarks : 0;
+        int rUnitsTotal = readTest ? numOfBlocks * numOfMarks : 0;
         int unitsTotal = wUnitsTotal + rUnitsTotal;
         float percentComplete;
 
@@ -68,10 +68,10 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
         DiskMark wMark;
         int startFileNum = App.nextMarkNumber;
 
-        DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, App.blockSequence);
-        run.setNumMarks(App.numOfMarks);
-        run.setNumBlocks(App.numOfBlocks);
-        run.setBlockSize(App.blockSizeKb);
+        DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, blockSequence);
+        run.setNumMarks(numOfMarks);
+        run.setNumBlocks(numOfBlocks);
+        run.setBlockSize(blockSizeKb);
         run.setTxSize(App.targetTxSizeKb());
         run.setDiskInfo(Util.getDiskInfo(dataDir));
 
@@ -91,7 +91,7 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
               that keeps writing data (in its own loop - for specified # of blocks). Each 'Mark' is timed
               and is reported to the GUI for display as each Mark completes.
              */
-        for (int m = startFileNum; m < startFileNum + App.numOfMarks && !userInterface.isBenchMarkCancelled(); m++) {
+        for (int m = startFileNum; m < startFileNum + numOfMarks && !userInterface.isBenchMarkCancelled(); m++) {
 
             if (App.multiFile) {
                 testFile = new File(dataDir.getAbsolutePath()
@@ -110,7 +110,7 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
             try {
                 try (RandomAccessFile rAccFile = new RandomAccessFile(testFile, mode)) {
                     for (int b = 0; b < numOfBlocks; b++) {
-                        if (App.blockSequence == DiskRun.BlockSequence.RANDOM) {
+                        if (blockSequence == DiskRun.BlockSequence.RANDOM) {
                             int rLoc = Util.randInt(0, numOfBlocks - 1);
                             rAccFile.seek(rLoc * blockSize);
                         } else {
