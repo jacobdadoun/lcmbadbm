@@ -3,9 +3,15 @@ package edu.touro.mco152.bm;
 import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
 import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
+import edu.touro.mco152.bm.persist.DBPersistenceObserver;
+import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 
 import javax.swing.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static edu.touro.mco152.bm.App.*;
 
@@ -29,7 +35,7 @@ import static edu.touro.mco152.bm.App.*;
  * DiskWorker is now dependent on SwingWorker via an instance type passed in to its constructor.
  */
 
-public class DiskWorker {
+public class DiskWorker extends BMSubject {
 
     private static UserInterface userInterface;
 
@@ -47,12 +53,12 @@ public class DiskWorker {
 
     static Boolean doBMLogic(){
 
-        /**
-         * We 'got here' because: a) End-user clicked 'Start' on the benchmark UI,
-         * which triggered the start-benchmark event associated with the App::startBenchmark()
-         * method.  b) startBenchmark() then instantiated a DiskWorker, and called
-         * its (super class's) execute() method, causing Swing to eventually
-         * call this doInBackground() method.
+        /*
+          We 'got here' because: a) End-user clicked 'Start' on the benchmark UI,
+          which triggered the start-benchmark event associated with the App::startBenchmark()
+          method.  b) startBenchmark() then instantiated a DiskWorker, and called
+          its (super class's) execute() method, causing Swing to eventually
+          call this doInBackground() method.
          */
 
         Gui.updateLegend();  // init chart legend info
@@ -63,13 +69,23 @@ public class DiskWorker {
         }
 
         BMCommandCenter bmCommand;
+        DiskRun diskRunTemp;
 
         /*
           The GUI allows either a write, read, or both types of BMs to be started. They are done serially.
          */
         if(App.writeTest) {
             bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-            bmCommand.doBMCommand();
+            if(bmCommand.doBMCommand()){
+                diskRunTemp = bmCommand.getDiskRun();
+                //Persist info about the Write BM Run (e.g. into Derby Database)
+                DiskWorker.registerObserver(new DBPersistenceObserver(diskRunTemp));
+
+                Gui gui = new Gui(diskRunTemp);
+                DiskWorker.registerObserver(gui);
+            }
+
+            notifyObservers();
         }
 
         /*
@@ -91,7 +107,15 @@ public class DiskWorker {
 
         if (App.readTest) {
             bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-            bmCommand.doBMCommand();
+            if(bmCommand.doBMCommand()){
+                diskRunTemp = bmCommand.getDiskRun();
+                //Persist info about the Write BM Run (e.g. into Derby Database)
+                DiskWorker.registerObserver(new DBPersistenceObserver(diskRunTemp));
+
+                Gui gui = new Gui(diskRunTemp);
+                DiskWorker.registerObserver(gui);
+            }
+            notifyObservers();
         }
 
 

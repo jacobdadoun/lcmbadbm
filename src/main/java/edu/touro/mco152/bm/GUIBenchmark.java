@@ -1,5 +1,6 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.externalsys.SlackManager;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 
@@ -114,5 +115,10 @@ public class GUIBenchmark extends SwingWorker<Boolean, DiskMark> implements User
         App.state = App.State.IDLE_STATE;
         Gui.mainFrame.adjustSensitivity();
         System.err.println("---FINISHED BENCHMARK---") ;
+
+        SlackManager slackManager = new SlackManager("BadBM");
+        slackManager.setMessage(":smile: Benchmark completed");
+        DiskWorker.registerObserver(slackManager);
+        DiskWorker.notifyObservers();
     }
 }
