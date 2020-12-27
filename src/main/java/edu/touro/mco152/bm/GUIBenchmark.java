@@ -116,9 +116,5 @@ public class GUIBenchmark extends SwingWorker<Boolean, DiskMark> implements User
         Gui.mainFrame.adjustSensitivity();
         System.err.println("---FINISHED BENCHMARK---") ;
 
-        SlackManager slackManager = new SlackManager("BadBM");
-        slackManager.setMessage(":smile: Benchmark completed");
-        DiskWorker.registerObserver(slackManager);
-        DiskWorker.notifyObservers();
     }
 }

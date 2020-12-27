@@ -3,6 +3,7 @@ package edu.touro.mco152.bm;
 import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
 import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
+import edu.touro.mco152.bm.externalsys.SlackManager;
 import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
@@ -115,9 +116,11 @@ public class DiskWorker extends BMSubject {
                 Gui gui = new Gui(diskRunTemp);
                 DiskWorker.registerObserver(gui);
             }
+            SlackManager slackManager = new SlackManager("BadBM");
+            slackManager.setMessage(":smile: Benchmark completed");
+            DiskWorker.registerObserver(slackManager);
             notifyObservers();
         }
-
 
         App.nextMarkNumber += App.numOfMarks;
         return true;
