@@ -11,6 +11,11 @@ import edu.touro.mco152.bm.BMObserver;
 import java.io.IOException;
 
 /**
+ * SlackManager is an observer class that will send a message to slack that our BM has finished after the read command
+ * class has been executed from DiskWorker
+ */
+
+/**
  * A Slack Manager for BadBM that just knows how to send a string msg to a pre-designated channel
  * using hard-coded authentication token.
  * Usage:

@@ -4,6 +4,10 @@ import edu.touro.mco152.bm.BMObserver;
 
 import javax.persistence.EntityManager;
 
+/**
+ * DBPersistenceObserver is an observer class that will update BM info to the EM "DataBase"
+ */
+
 public class DBPersistenceObserver implements BMObserver {
 
     DiskRun diskRun;

@@ -18,7 +18,7 @@ import java.awt.*;
 import java.text.NumberFormat;
 
 /**
- * Store gui references for easy access
+ * GUI is an observer class that will update BM info to BM GUI
  */
 public final class Gui implements BMObserver {
 

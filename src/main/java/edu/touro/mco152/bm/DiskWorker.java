@@ -69,13 +69,19 @@ public class DiskWorker extends BMSubject {
             Gui.resetTestData();
         }
 
+        // implement bmCommandCenter that will be assigned the respective Command Classes (i.e - write and read)
         BMCommandCenter bmCommand;
+        // implement DiskRun type to be assigned the diskrun from read and write respectively. It will then be passed to
+        // our GUI and DB Observers
         DiskRun diskRunTemp;
 
         /*
           The GUI allows either a write, read, or both types of BMs to be started. They are done serially.
          */
+
+        // Execute, Register and Notify
         if(App.writeTest) {
+            // Instantiation of bmCommand with
             bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
             if(bmCommand.doBMCommand()){
                 diskRunTemp = bmCommand.getDiskRun();
@@ -106,6 +112,7 @@ public class DiskWorker extends BMSubject {
                     "Clear Disk Cache Now", JOptionPane.PLAIN_MESSAGE);
         }
 
+        // Execute and Register. Then instantiate for slack and send a message when read is complete and Notify.
         if (App.readTest) {
             bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
             if(bmCommand.doBMCommand()){
