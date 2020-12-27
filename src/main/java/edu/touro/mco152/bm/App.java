@@ -298,8 +298,6 @@ public class App {
             }
         });
 
-        // TODO --> new DiskWorker(readTest/writeTest, numOfMarks, numOfBlocks, blockSizeKb, blockSequence)
-
         // When we pass this object into DiskWorker, the calls made to GUIBenchMark in SwingWorker::doBMLogic
         // will DEPEND on this object to reference its respective calls
         diskWorker = new DiskWorker(guiBenchmark);

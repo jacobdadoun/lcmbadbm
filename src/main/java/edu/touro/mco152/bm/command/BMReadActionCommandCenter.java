@@ -1,14 +1,10 @@
 package edu.touro.mco152.bm.command;
 
-import edu.touro.mco152.bm.App;
-import edu.touro.mco152.bm.DiskMark;
-import edu.touro.mco152.bm.UserInterface;
-import edu.touro.mco152.bm.Util;
+import edu.touro.mco152.bm.*;
+import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.persist.EM;
 import edu.touro.mco152.bm.ui.Gui;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,6 +25,7 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
     UserInterface userInterface;
     int numOfMarks, numOfBlocks, blockSizeKb;
     DiskRun.BlockSequence blockSequence;
+    DiskRun run;
 
     public BMReadActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
         this.userInterface = userInterface;
@@ -36,10 +33,11 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
         this.numOfBlocks = numOfBlocks;
         this.blockSizeKb = blockSizeKb;
         this.blockSequence = blockSequence;
+        run = new DiskRun(DiskRun.IOMode.READ, this.blockSequence);
     }
 
     @Override
-    public void doBMCommand() {
+    public boolean doBMCommand() {
 
         msg("Running readTest " + readTest);
         msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
@@ -69,7 +67,6 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
         DiskMark rMark;
         int startFileNum = nextMarkNumber;
 
-        DiskRun run = new DiskRun(DiskRun.IOMode.READ, blockSequence);
         run.setNumMarks(numOfMarks);
         run.setNumBlocks(numOfBlocks);
         run.setBlockSize(blockSizeKb);
@@ -133,17 +130,17 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
             run.setRunAvg(rMark.getCumAvg());
             run.setEndTime(new Date());
         }
-
-        EntityManager em = EM.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(run);
-        em.getTransaction().commit();
-
-        Gui.runPanel.addRun(run);
+        return true;
     }
 
     @Override
     public void undoBMCommand() {
 
     }
+
+    @Override
+    public DiskRun getDiskRun() {
+        return run;
+    }
+
 }

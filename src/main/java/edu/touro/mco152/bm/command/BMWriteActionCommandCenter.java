@@ -1,9 +1,7 @@
 package edu.touro.mco152.bm.command;
 
-import edu.touro.mco152.bm.App;
-import edu.touro.mco152.bm.DiskMark;
-import edu.touro.mco152.bm.UserInterface;
-import edu.touro.mco152.bm.Util;
+import edu.touro.mco152.bm.*;
+import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.persist.EM;
 import edu.touro.mco152.bm.ui.Gui;
@@ -29,6 +27,7 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
     UserInterface userInterface;
     int numOfMarks, numOfBlocks, blockSizeKb;
     DiskRun.BlockSequence blockSequence;
+    DiskRun run;
 
     public BMWriteActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
         this.userInterface = userInterface;
@@ -36,10 +35,11 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
         this.numOfBlocks = numOfBlocks;
         this.blockSizeKb = blockSizeKb;
         this.blockSequence = blockSequence;
+        run = new DiskRun(DiskRun.IOMode.WRITE, this.blockSequence);
     }
 
     @Override
-    public void doBMCommand() {
+    public boolean doBMCommand() {
 
         msg("Running writeTest " + writeTest);
         msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
@@ -68,7 +68,6 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
         DiskMark wMark;
         int startFileNum = App.nextMarkNumber;
 
-        DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, blockSequence);
         run.setNumMarks(numOfMarks);
         run.setNumBlocks(numOfBlocks);
         run.setBlockSize(blockSizeKb);
@@ -162,19 +161,17 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
             run.setEndTime(new Date());
         } // END outer loop for specified duration (number of 'marks') for WRITE bench mark
 
-            /*
-              Persist info about the Write BM Run (e.g. into Derby Database) and add it to a GUI panel
-             */
-        EntityManager em = EM.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(run);
-        em.getTransaction().commit();
-
-        Gui.runPanel.addRun(run);
+        return true;
     }
 
     @Override
     public void undoBMCommand() {
 
     }
+
+    @Override
+    public DiskRun getDiskRun() {
+        return run;
+    }
+
 }
