@@ -14,4 +14,6 @@ public interface UserInterface {
 
     boolean cancelBenchMark(boolean bool);
 
+    void showMessagePopUp();
+
 }
