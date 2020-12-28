@@ -1,5 +1,6 @@
 package edu.touro.mco152.bm;
 
+<<<<<<< HEAD
 import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
 import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
@@ -87,4 +88,9 @@ public class CommandExecutor {
         bmCommandCenter.notifyObservers();
     }
 
+=======
+public class CommandExecutor {
+
+    
+>>>>>>> BMCommandCenter.doBMCommand renamed to BMCommandCenter.execute
 }

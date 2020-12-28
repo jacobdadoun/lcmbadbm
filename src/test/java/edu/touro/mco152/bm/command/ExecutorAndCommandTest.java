@@ -1,20 +1,23 @@
 package edu.touro.mco152.bm.command;
 
-import edu.touro.mco152.bm.*;
+import edu.touro.mco152.bm.App;
+import edu.touro.mco152.bm.GUIBenchmark;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import java.io.File;
 import java.util.Properties;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ExecutorAndCommandTest {
+public class WriteReadCommandTest {
 
-    // Arrange
-    NonSwingBenchmark nonSwingBenchmark;
-    BenchmarkClient bmClient;
+    public GUIBenchmark guiBenchmark = new GUIBenchmark();
+    public int numOfMark = 50;
+    public int numOfBlocks = 64;
+    public int blockSizeKb = 64;
 
     @BeforeAll
     /**
@@ -35,7 +38,7 @@ public class ExecutorAndCommandTest {
 
         // code from startBenchmark
         //4. create data dir reference
-        App.dataDir = new File(App.locationDir.getAbsolutePath() + File.separator + App.DATADIRNAME);
+        App.dataDir = new File(App.locationDir.getAbsolutePath()+File.separator+App.DATADIRNAME);
 
         //5. remove existing test data if exist
         if (App.dataDir.exists()) {
@@ -51,39 +54,23 @@ public class ExecutorAndCommandTest {
         }
     }
 
-    /**
-     * writeCommand tests the boolean return value from BMWriteActionCommandCenter.execute()
-     */
     @Test
-    public void writeBMTest(){
-        // Arrange
+    public void writeCommand(){
         setupDefaultAsPerProperties();
-        // Act
-        nonSwingBenchmark = new NonSwingBenchmark("write");
-        // Assert
-        assertEquals("write", nonSwingBenchmark.readOrWrite);
-        assertTrue(nonSwingBenchmark.progressBool);
-        assertEquals(0, nonSwingBenchmark.currentProgress);
-        // ~ Act Again
-        bmClient = new BenchmarkClient(nonSwingBenchmark);
-        bmClient.executionDelegate();
+
+        BMWriteActionCommandCenter bmWriteActionCommandCenter = new BMWriteActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
+
+        assertTrue(bmWriteActionCommandCenter.doBMCommand());
+
     }
 
-    /**
-     * readCommand tests the boolean return value from BMReadActionCommandCenter.execute()
-     */
     @Test
-    public void readBMTest(){
-        // Arrange
+    public void readCommand(){
         setupDefaultAsPerProperties();
-        // Act
-        nonSwingBenchmark = new NonSwingBenchmark("read");
-        // Assert
-        assertEquals("read", nonSwingBenchmark.readOrWrite);
-        assertTrue(nonSwingBenchmark.progressBool);
-        assertEquals(0, nonSwingBenchmark.currentProgress);
-        // ~ Act Again
-        bmClient = new BenchmarkClient(nonSwingBenchmark);
-        bmClient.executionDelegate();
+
+        BMReadActionCommandCenter bmReadActionCommandCenter = new BMReadActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
+
+        assertTrue(bmReadActionCommandCenter.doBMCommand());
+
     }
 }
