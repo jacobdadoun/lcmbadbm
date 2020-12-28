@@ -1,17 +1,23 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.App;
+import edu.touro.mco152.bm.GUIBenchmark;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class BMReadCommandTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class WriteReadCommandTest {
+
+    public GUIBenchmark guiBenchmark = new GUIBenchmark();
+    public int numOfMark = 50;
+    public int numOfBlocks = 64;
+    public int blockSizeKb = 64;
 
     @BeforeAll
     /**
@@ -49,9 +55,22 @@ public class BMReadCommandTest {
     }
 
     @Test
-    public void testExecute(){
+    public void writeCommand(){
+        setupDefaultAsPerProperties();
 
+        BMWriteActionCommandCenter bmWriteActionCommandCenter = new BMWriteActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
+
+        assertTrue(bmWriteActionCommandCenter.doBMCommand());
 
     }
 
+    @Test
+    public void readCommand(){
+        setupDefaultAsPerProperties();
+
+        BMReadActionCommandCenter bmReadActionCommandCenter = new BMReadActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
+
+        assertTrue(bmReadActionCommandCenter.doBMCommand());
+
+    }
 }

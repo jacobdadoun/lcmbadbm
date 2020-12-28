@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class BMSubject {
+public class BMSubject {
 
     // bmObservers - A synchronized ArrayList that will store any object of type BMObserver
     private static List<BMObserver> bmObserverRegistry = Collections.synchronizedList(new ArrayList<>());
@@ -13,7 +13,7 @@ public abstract class BMSubject {
      * Adds a BMObserver object to the array
      * @param bmObserver is what we pass in to be added for execution
      */
-    public static void registerObserver(BMObserver bmObserver){
+    public void registerObserver(BMObserver bmObserver){
         bmObserverRegistry.add(bmObserver);
     }
 

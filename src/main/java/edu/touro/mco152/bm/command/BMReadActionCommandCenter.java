@@ -1,6 +1,7 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.*;
+import edu.touro.mco152.bm.externalsys.SlackManager;
 import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
@@ -38,6 +39,7 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
 
     @Override
     public boolean doBMCommand() {
+        SlackManager slackManager = new SlackManager("BadBM");
 
         msg("Running readTest " + readTest);
         msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
@@ -107,11 +109,14 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
                         userInterface.provideProgress((int) percentComplete);
                     }
                 }
-            } catch (FileNotFoundException fnfEx) {
+                slackManager.setMessage(":smile: Benchmark completed");
+            }
+            catch (FileNotFoundException fnfEx) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, fnfEx);
             }
             catch (IOException ioEx) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ioEx);
+                slackManager.setMessage(":cry: Benchmark failed");
             }
 
             long endTime = System.nanoTime();
@@ -129,6 +134,16 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
             run.setRunMin(rMark.getCumMin());
             run.setRunAvg(rMark.getCumAvg());
             run.setEndTime(new Date());
+        }
+
+        //Persist info about the Write BM Run (e.g. into Derby Database)
+        DiskWorker.bmSubject.registerObserver(new DBPersistenceObserver(run));
+
+        DiskWorker.bmSubject.registerObserver(new Gui(run));
+
+        // Put if here for Max speed > 3% ??
+        if(run.getRunMax() > (run.getRunAvg() * 0.03)){
+            DiskWorker.bmSubject.registerObserver(slackManager);
         }
         return true;
     }

@@ -19,6 +19,7 @@ import static edu.touro.mco152.bm.App.*;
 import static edu.touro.mco152.bm.App.msg;
 import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
+
 /**
  * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
  */
@@ -161,6 +162,10 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
             run.setEndTime(new Date());
         } // END outer loop for specified duration (number of 'marks') for WRITE bench mark
 
+        //Persist info about the Write BM Run (e.g. into Derby Database)
+        DiskWorker.bmSubject.registerObserver(new DBPersistenceObserver(run));
+
+        DiskWorker.bmSubject.registerObserver(new Gui(run));
         return true;
     }
 

@@ -76,13 +76,37 @@ public class GUIBenchmark extends SwingWorker<Boolean, DiskMark> implements User
         return cancel(bool);
     }
 
+    @Override
+    public void showMessagePopUp() {
+        JOptionPane.showMessageDialog(Gui.mainFrame,
+                "For valid READ measurements please clear the disk cache by\n" +
+                        "using the included RAMMap.exe or flushmem.exe utilities.\n" +
+                        "Removable drives can be disconnected and reconnected.\n" +
+                        "For system drives use the WRITE and READ operations \n" +
+                        "independantly by doing a cold reboot after the WRITE",
+                "Clear Disk Cache Now", JOptionPane.PLAIN_MESSAGE);
+    }
+
 
     /**
      * Called by WorkerThreads from execute. What's defined here will be executed by the threads.
      * @return a boolean to it's caller from SwingWorker
      */
     @Override
-    protected Boolean doInBackground(){
+    public Boolean doInBackground(){
+        /*
+          We 'got here' because: a) End-user clicked 'Start' on the benchmark UI,
+          which triggered the start-benchmark event associated with the App::startBenchmark()
+          method.  b) startBenchmark() then instantiated a DiskWorker, and passed it an instance of this class.
+          Then, App.java called DiskWorker.executionDelegate which will call executeBenchmark in this class.
+         */
+        Gui.updateLegend();  // init chart legend info
+
+        if (App.autoReset) {
+            App.resetTestData();
+            Gui.resetTestData();
+        }
+
         return DiskWorker.doBMLogic();
     }
 
