@@ -7,7 +7,7 @@ import edu.touro.mco152.bm.persist.DiskRun;
  * Diskworker instantiates a command object and calls it's execute method
  */
 public interface BMCommandCenter {
-    boolean doBMCommand();
+    boolean execute();
     void undoBMCommand();
     DiskRun getDiskRun();
 }

@@ -38,7 +38,7 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
     }
 
     @Override
-    public boolean doBMCommand() {
+    public boolean execute() {
         SlackManager slackManager = new SlackManager("BadBM");
 
         msg("Running readTest " + readTest);
