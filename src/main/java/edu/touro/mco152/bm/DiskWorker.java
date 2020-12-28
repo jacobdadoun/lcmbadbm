@@ -57,7 +57,7 @@ public class DiskWorker {
         if(App.writeTest) {
 
             bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-            if(bmCommand.doBMCommand()){
+            if(bmCommand.execute()){
                 BMSubject.notifyObservers();
             }
 
@@ -77,7 +77,7 @@ public class DiskWorker {
         // Execute and Register. Then instantiate for slack and send a message when read is complete and Notify.
         if (App.readTest) {
             bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-            if(bmCommand.doBMCommand()){
+            if(bmCommand.execute()){
                 BMSubject.notifyObservers();
             }
 

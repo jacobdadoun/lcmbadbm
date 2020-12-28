@@ -40,7 +40,7 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
     }
 
     @Override
-    public boolean doBMCommand() {
+    public boolean execute() {
 
         msg("Running writeTest " + writeTest);
         msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
