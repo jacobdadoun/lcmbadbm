@@ -24,6 +24,7 @@ import java.io.IOException;
  */
 public class SlackManager implements BMObserver {
     private static Slack slack = null;  // obtain/keep one copy of expensive item
+    public boolean checkRunFlag;
     /**
      * Token for use with Slack API, representing info about our bot/app/channel.
      * If the token is a bot token, it starts with `xoxb-` while if it's a user token, it starts with `xoxp-`
@@ -58,6 +59,7 @@ public class SlackManager implements BMObserver {
                 System.err.println("SlackManager: Problem with auto-validation of Slack: "
                         + testResponse.getError());
             }
+            checkRunFlag = false;
         } catch (IOException | SlackApiException exc) {
             System.err.println("SlackManager: Problem with auto-validation of Slack");
             exc.printStackTrace();
@@ -113,5 +115,11 @@ public class SlackManager implements BMObserver {
         // Boolean worked = slackmgr.postMsg2OurChannel(":cry: Benchmark failed");
         Boolean worked = postMsg2OurChannel(msg);
         System.err.println("Returned boolean from sending msg is " + worked);
+        checkRunFlag = true;
+    }
+
+    @Override
+    public boolean getCheckRunFlag() {
+        return checkRunFlag;
     }
 }

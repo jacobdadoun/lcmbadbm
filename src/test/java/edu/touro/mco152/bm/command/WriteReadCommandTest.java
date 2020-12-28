@@ -1,9 +1,7 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.App;
-import edu.touro.mco152.bm.DiskWorker;
 import edu.touro.mco152.bm.GUIBenchmark;
-import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import java.io.File;
