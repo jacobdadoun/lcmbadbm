@@ -9,8 +9,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * BMCommandCenter is an interface that our read/write benchmark will implement.
- * Diskworker instantiates a command object and calls it's execute method
+ * BMCommandCenter is an abstract class that our read/write command classes will extend.
+ *
+ * CommandExecutor instantiates a command object and calls it's execute method.
  */
 public abstract class BMCommandCenter {
 
@@ -58,7 +59,7 @@ public abstract class BMCommandCenter {
      * by one notifies each of them by calling their update()
      */
     public void notifyObservers(){
-        // Notify BMObservers by their .updateMethods
+        // Notify BMObservers by their .update method
         for (BMObserver bmObserverTemp: bmObserverRegistry) {
             bmObserverTemp.update();
         }

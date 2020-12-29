@@ -16,13 +16,10 @@ import static edu.touro.mco152.bm.App.*;
 import static edu.touro.mco152.bm.App.msg;
 import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
-
 /**
  * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
  */
 public class BMWriteActionCommandCenter extends BMCommandCenter {
-
-
 
     public BMWriteActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
         super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);

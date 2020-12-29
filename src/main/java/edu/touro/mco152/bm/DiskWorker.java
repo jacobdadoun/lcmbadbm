@@ -1,5 +1,9 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.command.BMCommandCenter;
+import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
+import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
+
 /**
  * Run the disk benchmarking as a Swing-compliant thread (only one of these threads can run at
  * once.) Cooperates with Swing to provide and make use of interim and final progress and
@@ -38,6 +42,7 @@ public class DiskWorker {
 
     public static Boolean doBMLogic(){
 
+        BMCommandCenter bmCommand;
         CommandExecutor commandExecutor;
 
         /*
@@ -47,10 +52,13 @@ public class DiskWorker {
 
         // Execute, Register and Notify
         if(App.writeTest) {
-            commandExecutor = new CommandExecutor(userInterface, "write");
-            commandExecutor.setDefaultBMParams();
-            if(commandExecutor.executeBMCommandObject()){
-                commandExecutor.notifyCommandObservers();
+            bmCommand = new BMWriteActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
+                    App.blockSequence);
+            commandExecutor = new CommandExecutor(bmCommand);
+
+            commandExecutor.defaultWriteRegistration();
+            if(commandExecutor.executeLogicDelegate()){
+                commandExecutor.notifyObserversDelegate();
             }
         }
 
@@ -66,10 +74,12 @@ public class DiskWorker {
 
         // Execute and Register. Then instantiate for slack and send a message when read is complete and Notify.
         if (App.readTest) {
-            commandExecutor = new CommandExecutor(userInterface, "read");
-            commandExecutor.setDefaultBMParams();
-            if(commandExecutor.executeBMCommandObject()){
-                commandExecutor.notifyCommandObservers();
+            bmCommand = new BMReadActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
+                    App.blockSequence);
+            commandExecutor = new CommandExecutor(bmCommand);
+            commandExecutor.defaultReadRegistration();
+            if(commandExecutor.executeLogicDelegate()){
+                commandExecutor.notifyObserversDelegate();
             }
         }
 

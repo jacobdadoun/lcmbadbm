@@ -6,6 +6,9 @@ package edu.touro.mco152.bm;
  *  writeBMLogicNoSwing or readBMLogicNoSwing
  */
 
+import edu.touro.mco152.bm.command.BMCommandCenter;
+import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
+import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
 import edu.touro.mco152.bm.persist.DiskRun;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +18,8 @@ public class BenchmarkClient {
 
     // Arrange
     private static UserInterface userInterface;
+    public static BMCommandCenter bmCommand;
+    public static CommandExecutor commandExecutor;
     // final command parameter values defined:
     public static final int numOfMark = 50;
     public static final int numOfBlocks = 64;
@@ -46,11 +51,12 @@ public class BenchmarkClient {
     @Test
     public static boolean writeBMLogicNoSwing(){
         // Act
-        CommandExecutor commandExecutor = new CommandExecutor(userInterface, "write");
-        commandExecutor.setCustomBMParams(numOfMark, numOfBlocks, blockSizeKb, blockSequence);
+        bmCommand = new BMWriteActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
+                App.blockSequence);
+        commandExecutor = new CommandExecutor(bmCommand);
         // Assert
-        assertTrue(commandExecutor.executeBMCommandObject());
-        return commandExecutor.executeBMCommandObject();
+        assertTrue(commandExecutor.executeLogicDelegate());
+        return commandExecutor.executeLogicDelegate();
     }
 
     /**
@@ -60,10 +66,11 @@ public class BenchmarkClient {
     @Test
     public static boolean readBMLogicNoSwing(){
         // Act
-        CommandExecutor commandExecutor = new CommandExecutor(userInterface, "read");
-        commandExecutor.setCustomBMParams(numOfMark, numOfBlocks, blockSizeKb, blockSequence);
+        bmCommand = new BMReadActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
+                App.blockSequence);
+        commandExecutor = new CommandExecutor(bmCommand);
         // Assert
-        assertTrue(commandExecutor.executeBMCommandObject());
-        return commandExecutor.executeBMCommandObject();
+        assertTrue(commandExecutor.executeLogicDelegate());
+        return commandExecutor.executeLogicDelegate();
     }
 }
