@@ -1,8 +1,6 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.*;
-import edu.touro.mco152.bm.externalsys.SlackManager;
-import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 
@@ -21,25 +19,14 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
 /**
  * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
  */
-public class BMReadActionCommandCenter implements BMCommandCenter {
-
-    UserInterface userInterface;
-    int numOfMarks, numOfBlocks, blockSizeKb;
-    DiskRun.BlockSequence blockSequence;
-    DiskRun run;
+public class BMReadActionCommandCenter extends BMCommandCenter {
 
     public BMReadActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
-        this.userInterface = userInterface;
-        this.numOfMarks = numOfMarks;
-        this.numOfBlocks = numOfBlocks;
-        this.blockSizeKb = blockSizeKb;
-        this.blockSequence = blockSequence;
-        run = new DiskRun(DiskRun.IOMode.READ, this.blockSequence);
+        super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
     }
 
     @Override
-    public boolean doBMCommand() {
-        SlackManager slackManager = new SlackManager("BadBM");
+    public boolean execute() {
 
         msg("Running readTest " + readTest);
         msg("num files: " + numOfMarks + ", num blks: " + numOfBlocks
@@ -109,14 +96,14 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
                         userInterface.provideProgress((int) percentComplete);
                     }
                 }
-                slackManager.setMessage(":smile: Benchmark completed");
+                message = ":smile: Benchmark completed";
             }
             catch (FileNotFoundException fnfEx) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, fnfEx);
             }
             catch (IOException ioEx) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ioEx);
-                slackManager.setMessage(":cry: Benchmark failed");
+                message = ":cry: Benchmark failed";
             }
 
             long endTime = System.nanoTime();
@@ -134,16 +121,6 @@ public class BMReadActionCommandCenter implements BMCommandCenter {
             run.setRunMin(rMark.getCumMin());
             run.setRunAvg(rMark.getCumAvg());
             run.setEndTime(new Date());
-        }
-
-        //Persist info about the Write BM Run (e.g. into Derby Database)
-        DiskWorker.bmSubject.registerObserver(new DBPersistenceObserver(run));
-
-        DiskWorker.bmSubject.registerObserver(new Gui(run));
-
-        // Put if here for Max speed > 3% ??
-        if(run.getRunMax() > (run.getRunAvg() * 0.03)){
-            DiskWorker.bmSubject.registerObserver(slackManager);
         }
         return true;
     }

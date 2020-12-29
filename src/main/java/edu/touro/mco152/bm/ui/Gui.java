@@ -31,11 +31,9 @@ public final class Gui implements BMObserver {
     public static JProgressBar progressBar = null;
     public static RunPanel runPanel = null;
     public DiskRun diskRun;
-    public boolean checkRunFlag;
 
     public Gui(DiskRun diskRun){
         this.diskRun = diskRun;
-        checkRunFlag = false;
     }
 
     public static ChartPanel createChartPanel() {
@@ -150,11 +148,5 @@ public final class Gui implements BMObserver {
     @Override
     public void update() {
         runPanel.addRun(diskRun);
-        checkRunFlag = true;
-    }
-
-    @Override
-    public boolean getCheckRunFlag() {
-        return checkRunFlag;
     }
 }

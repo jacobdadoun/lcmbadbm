@@ -1,7 +1,6 @@
 package edu.touro.mco152.bm.persist;
 
 import edu.touro.mco152.bm.BMObserver;
-
 import javax.persistence.EntityManager;
 
 /**
@@ -11,11 +10,9 @@ import javax.persistence.EntityManager;
 public class DBPersistenceObserver implements BMObserver {
 
     DiskRun diskRun;
-    public boolean checkRunFlag;
 
     public DBPersistenceObserver(DiskRun diskRun){
         this.diskRun = diskRun;
-        checkRunFlag = false;
     }
 
     @Override
@@ -24,11 +21,6 @@ public class DBPersistenceObserver implements BMObserver {
         em.getTransaction().begin();
         em.persist(diskRun);
         em.getTransaction().commit();
-        checkRunFlag = true;
     }
 
-    @Override
-    public boolean getCheckRunFlag() {
-        return checkRunFlag;
-    }
 }

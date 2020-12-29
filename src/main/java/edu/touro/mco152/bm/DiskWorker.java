@@ -1,11 +1,5 @@
 package edu.touro.mco152.bm;
 
-import edu.touro.mco152.bm.command.BMCommandCenter;
-import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
-import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
-
-import static edu.touro.mco152.bm.App.*;
-
 /**
  * Run the disk benchmarking as a Swing-compliant thread (only one of these threads can run at
  * once.) Cooperates with Swing to provide and make use of interim and final progress and
@@ -29,7 +23,6 @@ import static edu.touro.mco152.bm.App.*;
 public class DiskWorker {
 
     private static UserInterface userInterface;
-    public static BMSubject bmSubject = new BMSubject();
 
     public DiskWorker(UserInterface userInterface) {
         DiskWorker.userInterface = userInterface;
@@ -45,8 +38,7 @@ public class DiskWorker {
 
     public static Boolean doBMLogic(){
 
-        // implement bmCommandCenter that will be assigned the respective Command Classes (i.e - write and read)
-        BMCommandCenter bmCommand;
+        CommandExecutor commandExecutor;
 
         /*
           The GUI allows either a write, read, or both types of BMs to be started. They are done serially. Only now,
@@ -55,12 +47,11 @@ public class DiskWorker {
 
         // Execute, Register and Notify
         if(App.writeTest) {
-
-            bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-            if(bmCommand.doBMCommand()){
-                BMSubject.notifyObservers();
+            commandExecutor = new CommandExecutor(userInterface, "write");
+            commandExecutor.setDefaultBMParams();
+            if(commandExecutor.executeBMCommandObject()){
+                commandExecutor.notifyCommandObservers();
             }
-
         }
 
         /*
@@ -68,7 +59,6 @@ public class DiskWorker {
           make it more 'fair'. For example a networking benchmark might close and re-open sockets,
           a memory benchmark might clear or invalidate the Op Systems TLB or other caches, etc.
          */
-
         // try renaming all files to clear cache
         if (App.readTest && App.writeTest && !userInterface.isBenchMarkCancelled()) {
             userInterface.showMessagePopUp();
@@ -76,11 +66,11 @@ public class DiskWorker {
 
         // Execute and Register. Then instantiate for slack and send a message when read is complete and Notify.
         if (App.readTest) {
-            bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-            if(bmCommand.doBMCommand()){
-                BMSubject.notifyObservers();
+            commandExecutor = new CommandExecutor(userInterface, "read");
+            commandExecutor.setDefaultBMParams();
+            if(commandExecutor.executeBMCommandObject()){
+                commandExecutor.notifyCommandObservers();
             }
-
         }
 
         App.nextMarkNumber += App.numOfMarks;

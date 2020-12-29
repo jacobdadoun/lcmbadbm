@@ -7,6 +7,7 @@ import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.api.ApiTestResponse;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import edu.touro.mco152.bm.BMObserver;
+import edu.touro.mco152.bm.persist.DiskRun;
 
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ import java.io.IOException;
  */
 public class SlackManager implements BMObserver {
     private static Slack slack = null;  // obtain/keep one copy of expensive item
-    public boolean checkRunFlag;
+    public DiskRun diskRun;
     /**
      * Token for use with Slack API, representing info about our bot/app/channel.
      * If the token is a bot token, it starts with `xoxb-` while if it's a user token, it starts with `xoxp-`
@@ -46,8 +47,9 @@ public class SlackManager implements BMObserver {
      *
      * @param appName - pass a sring like BadBM, or whatever name you want to appear in msgs
      */
-    public SlackManager(String appName) {
+    public SlackManager(String appName, DiskRun diskRun) {
         this.appName = appName;
+        this.diskRun = diskRun;
 
         if (slack == null)
             slack = Slack.getInstance();
@@ -59,7 +61,6 @@ public class SlackManager implements BMObserver {
                 System.err.println("SlackManager: Problem with auto-validation of Slack: "
                         + testResponse.getError());
             }
-            checkRunFlag = false;
         } catch (IOException | SlackApiException exc) {
             System.err.println("SlackManager: Problem with auto-validation of Slack");
             exc.printStackTrace();
@@ -115,11 +116,5 @@ public class SlackManager implements BMObserver {
         // Boolean worked = slackmgr.postMsg2OurChannel(":cry: Benchmark failed");
         Boolean worked = postMsg2OurChannel(msg);
         System.err.println("Returned boolean from sending msg is " + worked);
-        checkRunFlag = true;
-    }
-
-    @Override
-    public boolean getCheckRunFlag() {
-        return checkRunFlag;
     }
 }
