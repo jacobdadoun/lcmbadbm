@@ -48,6 +48,7 @@ public class DiskWorker {
         // Execute, Register and Notify
         if(App.writeTest) {
             commandExecutor = new CommandExecutor(userInterface, "write");
+            commandExecutor.setDefaultBMParams();
             if(commandExecutor.executeBMCommandObject()){
                 commandExecutor.notifyCommandObservers();
             }
@@ -65,7 +66,8 @@ public class DiskWorker {
 
         // Execute and Register. Then instantiate for slack and send a message when read is complete and Notify.
         if (App.readTest) {
-            commandExecutor = new CommandExecutor(userInterface, "write");
+            commandExecutor = new CommandExecutor(userInterface, "read");
+            commandExecutor.setDefaultBMParams();
             if(commandExecutor.executeBMCommandObject()){
                 commandExecutor.notifyCommandObservers();
             }

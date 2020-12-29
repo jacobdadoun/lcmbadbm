@@ -1,13 +1,9 @@
 package edu.touro.mco152.bm;
 
-import edu.touro.mco152.bm.externalsys.SlackManager;
-import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.List;
 
 import static edu.touro.mco152.bm.App.*;
