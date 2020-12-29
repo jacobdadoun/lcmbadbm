@@ -12,7 +12,7 @@ public class BenchmarkClient {
     public static final int numOfMark = 50;
     public static final int numOfBlocks = 64;
     public static final int blockSizeKb = 64;
-    public static final DiskRun.BlockSequence blockSequence = App.blockSequence;
+    public static final DiskRun.BlockSequence blockSequence = DiskRun.BlockSequence.SEQUENTIAL;
 
     public BenchmarkClient(UserInterface userInterface){
         BenchmarkClient.userInterface = userInterface;
