@@ -1,20 +1,20 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.*;
-import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import java.io.File;
 import java.util.Properties;
-
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExecutorAndCommandTest {
 
+    // Arrange
+    NonSwingBenchmark nonSwingBenchmark;
+    BenchmarkClient bmClient;
 
     @BeforeAll
     /**
@@ -56,10 +56,16 @@ public class ExecutorAndCommandTest {
      */
     @Test
     public void writeBMTest(){
+        // Arrange
         setupDefaultAsPerProperties();
-
-        NonSwingBenchmark nonSwingBenchmark = new NonSwingBenchmark("write");
-        BenchmarkClient bmClient = new BenchmarkClient(nonSwingBenchmark);
+        // Act
+        nonSwingBenchmark = new NonSwingBenchmark("write");
+        // Assert
+        assertEquals("write", nonSwingBenchmark.readOrWrite);
+        assertTrue(nonSwingBenchmark.progressBool);
+        assertEquals(0, nonSwingBenchmark.currentProgress);
+        // ~ Act Again
+        bmClient = new BenchmarkClient(nonSwingBenchmark);
         bmClient.executionDelegate();
     }
 
@@ -68,10 +74,16 @@ public class ExecutorAndCommandTest {
      */
     @Test
     public void readBMTest(){
+        // Arrange
         setupDefaultAsPerProperties();
-
-        NonSwingBenchmark nonSwingBenchmark = new NonSwingBenchmark("read");
-        BenchmarkClient bmClient = new BenchmarkClient(nonSwingBenchmark);
+        // Act
+        nonSwingBenchmark = new NonSwingBenchmark("read");
+        // Assert
+        assertEquals("read", nonSwingBenchmark.readOrWrite);
+        assertTrue(nonSwingBenchmark.progressBool);
+        assertEquals(0, nonSwingBenchmark.currentProgress);
+        // ~ Act Again
+        bmClient = new BenchmarkClient(nonSwingBenchmark);
         bmClient.executionDelegate();
     }
 }
