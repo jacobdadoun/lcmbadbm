@@ -1,12 +1,9 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.*;
-import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.persist.EM;
 import edu.touro.mco152.bm.ui.Gui;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,20 +20,12 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 /**
  * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
  */
-public class BMWriteActionCommandCenter implements BMCommandCenter {
+public class BMWriteActionCommandCenter extends BMCommandCenter {
 
-    UserInterface userInterface;
-    int numOfMarks, numOfBlocks, blockSizeKb;
-    DiskRun.BlockSequence blockSequence;
-    DiskRun run;
+
 
     public BMWriteActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
-        this.userInterface = userInterface;
-        this.numOfMarks = numOfMarks;
-        this.numOfBlocks = numOfBlocks;
-        this.blockSizeKb = blockSizeKb;
-        this.blockSequence = blockSequence;
-        run = new DiskRun(DiskRun.IOMode.WRITE, this.blockSequence);
+        super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
     }
 
     @Override
@@ -161,11 +150,6 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
             run.setRunAvg(wMark.getCumAvg());
             run.setEndTime(new Date());
         } // END outer loop for specified duration (number of 'marks') for WRITE bench mark
-
-        //Persist info about the Write BM Run (e.g. into Derby Database)
-        DiskWorker.bmSubject.registerObserver(new DBPersistenceObserver(run));
-
-        DiskWorker.bmSubject.registerObserver(new Gui(run));
         return true;
     }
 
