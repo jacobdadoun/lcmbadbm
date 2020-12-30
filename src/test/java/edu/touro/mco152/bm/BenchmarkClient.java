@@ -10,27 +10,28 @@ import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
 import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
 import edu.touro.mco152.bm.persist.DiskRun;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BenchmarkClient {
 
-    // Arrange
-    private static UserInterface userInterface;
+    public static UserInterface userInterface;
     public static BMCommandCenter bmCommand;
     public static CommandExecutor commandExecutor;
     // final command parameter values defined:
-    public static final int numOfMark = 50;
+    public static final int numOfMarks = 50;
     public static final int numOfBlocks = 64;
     public static final int blockSizeKb = 64;
     public static final DiskRun.BlockSequence blockSequence = DiskRun.BlockSequence.SEQUENTIAL;
+
+    public static boolean writeTestComplete;
+    public static boolean readTestComplete;
 
     /**
      * @param userInterface variable that our logic will use to communicate with NonSwingBenchmark
      */
     public BenchmarkClient(UserInterface userInterface){
         BenchmarkClient.userInterface = userInterface;
+        writeTestComplete = false;
+        readTestComplete = false;
     }
 
     /**
@@ -44,33 +45,61 @@ public class BenchmarkClient {
         userInterface.cancelBenchMark(bool);
     }
 
+    public static boolean doBMLogic_NoSwing(){
+
+        if(App.writeTest){
+            if(writeBMLogicNoSwing()){
+                commandExecutor.notifyObserversDelegate();
+            }
+            writeTestComplete = true;
+        }
+
+        ExecutorTest executorTest = new ExecutorTest(commandExecutor);
+        if(executorTest.test_ifExecuted()){
+            executorTest.checkListForUpdateBooleans();
+        }
+
+        // try renaming all files to clear cache
+        if (App.readTest && App.writeTest && !userInterface.isBenchMarkCancelled()) {
+            userInterface.showMessagePopUp();
+        }
+
+        if(App.readTest){
+            if(readBMLogicNoSwing()){
+                commandExecutor.notifyObserversDelegate();
+            }
+            readTestComplete = true;
+        }
+
+        executorTest = new ExecutorTest(commandExecutor);
+        if(executorTest.test_ifExecuted()){
+            executorTest.checkListForUpdateBooleans();
+        }
+
+        return true;
+    }
+
     /**
      * writeBMLogicNoSwing gets called by NonSwingBenchmark.execute()
      * @return boolean whether or not Command object was executed
      */
-    @Test
-    public static boolean writeBMLogicNoSwing(){
-        // Act
-        bmCommand = new BMWriteActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
-                App.blockSequence);
+    private static boolean writeBMLogicNoSwing(){
+        bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb,
+                blockSequence);
         commandExecutor = new CommandExecutor(bmCommand);
-        // Assert
-        assertTrue(commandExecutor.executeLogicDelegate());
+        commandExecutor.registerObserverDelegate(new TestObserver());
         return commandExecutor.executeLogicDelegate();
     }
 
     /**
-     * radBMLogicNoSwing gets called by NonSwingBenchmark.execute()
+     * readBMLogicNoSwing gets called by NonSwingBenchmark.execute()
      * @return boolean whether or not Command object was executed
      */
-    @Test
-    public static boolean readBMLogicNoSwing(){
-        // Act
-        bmCommand = new BMReadActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
-                App.blockSequence);
+    private static boolean readBMLogicNoSwing(){
+        bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb,
+                blockSequence);
         commandExecutor = new CommandExecutor(bmCommand);
-        // Assert
-        assertTrue(commandExecutor.executeLogicDelegate());
+        commandExecutor.registerObserverDelegate(new TestObserver());
         return commandExecutor.executeLogicDelegate();
     }
 }

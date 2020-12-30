@@ -117,4 +117,9 @@ public class SlackManager implements BMObserver {
         Boolean worked = postMsg2OurChannel(msg);
         System.err.println("Returned boolean from sending msg is " + worked);
     }
+
+    @Override
+    public Boolean isUpdated() {
+        return null;
+    }
 }

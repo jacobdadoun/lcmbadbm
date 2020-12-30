@@ -64,4 +64,8 @@ public abstract class BMCommandCenter {
             bmObserverTemp.update();
         }
     }
+
+    public List<BMObserver> getBmObserverRegistry(){
+        return bmObserverRegistry;
+    }
 }
