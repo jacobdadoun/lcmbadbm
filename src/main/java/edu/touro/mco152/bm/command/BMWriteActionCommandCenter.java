@@ -16,8 +16,13 @@ import static edu.touro.mco152.bm.App.*;
 import static edu.touro.mco152.bm.App.msg;
 import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
+
 /**
- * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
+ * This class has one purpose, to provide instructions for writing a benchmark. We instantiate this class with an object
+ * of type SwingWorker and UserInterface (GUIBenchMark), which will be used in doBMLogic to call instruction to
+ * GUIBenchMark::isBenchMarkCancelled, ::executeBenchMark, ::publishToGUI and ::provideProgress.
+ *
+ * Extend our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
  */
 public class BMWriteActionCommandCenter extends BMCommandCenter {
 
@@ -25,6 +30,14 @@ public class BMWriteActionCommandCenter extends BMCommandCenter {
         super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
     }
 
+    /**
+     * At the end of the day, execution itself is dependant on one method... this one.
+     * No longer do we reference important data so dependant and 'tightly coupled'. Now,
+     * The essential variables needed will come defined from the client who doesn't mind
+     * being tied down to App.java in order for it to set them independently.
+     *
+     * @return a boolean to an if-statement condition in the CommandExecutor.executeLogicDelegate
+     */
     @Override
     public boolean execute() {
 
@@ -155,6 +168,10 @@ public class BMWriteActionCommandCenter extends BMCommandCenter {
 
     }
 
+    /**
+     * Client should be able to call for a DiskRun when one needed (Observers take DiskRuns as constructor params)
+     * @return the data for a single run.
+     */
     @Override
     public DiskRun getDiskRun() {
         return run;
