@@ -9,8 +9,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * BMCommandCenter is an interface that our read/write benchmark will implement.
- * Diskworker instantiates a command object and calls it's execute method
+ * BMCommandCenter is an abstract class that is capable of reading or writing benchmarks.
+ * However, it must be extended and have its abstract methods defined. This Command object must be
+ * instantiated with the essentials: A UserInterface and a couple of integers that are vital for a
+ * successful benchmark execution. This class has its capabilities with Read and Write classes.
  */
 public abstract class BMCommandCenter {
 
@@ -21,6 +23,8 @@ public abstract class BMCommandCenter {
     protected int numOfMarks, numOfBlocks, blockSizeKb;
     protected DiskRun.BlockSequence blockSequence;
     protected DiskRun run;
+
+    // variable assigned a message for preliminary status update.
     public String message = "";
 
     public BMCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
@@ -32,6 +36,7 @@ public abstract class BMCommandCenter {
         run = new DiskRun(DiskRun.IOMode.WRITE, this.blockSequence);
     }
 
+    // Abstracts must be defined in child class
     public abstract boolean execute();
     public abstract void undoBMCommand();
     public abstract DiskRun getDiskRun();
@@ -58,9 +63,19 @@ public abstract class BMCommandCenter {
      * by one notifies each of them by calling their update()
      */
     public void notifyObservers(){
-        // Notify BMObservers by their .updateMethods
+        // Notify BMObservers by their .update method
         for (BMObserver bmObserverTemp: bmObserverRegistry) {
             bmObserverTemp.update();
         }
+    }
+
+    /**
+     * Client: Hey man, I need a list of your observers. (A buyer)
+     * BMCommandObject: Here you go. (gives observers)
+     *
+     * @return An object of the List interface. In this case an ArrayList.
+     */
+    public List<BMObserver> getBmObserverRegistry(){
+        return bmObserverRegistry;
     }
 }

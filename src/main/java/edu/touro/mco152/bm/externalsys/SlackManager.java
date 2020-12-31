@@ -26,13 +26,16 @@ import java.io.IOException;
 public class SlackManager implements BMObserver {
     private static Slack slack = null;  // obtain/keep one copy of expensive item
     public DiskRun diskRun;
+
     /**
      * Token for use with Slack API, representing info about our bot/app/channel.
      * If the token is a bot token, it starts with `xoxb-` while if it's a user token, it starts with `xoxp-`
      * This should really come from one of the badbm properties files, or from System.getenv()
      */
-    private final String token = "xoxb-121008389125-1115203038051-sUdT3T2GJQ4aLZDVHjazQgxC";
-    /**
+    // This token does not work anymore. (Not so)Thankfully, a classmate merged one to main before I could!
+    // Renamed from 'token' -> 'dummyToken'.
+    private final String token = "xoxb-8359216899-1017803038051-sT3T2GJQ4aLZDVHjazQgxC";
+    /**Ud
      * The channel we will send all our messages to
      */
     private final String ourChannel = "mco152_auto_notifications";
@@ -116,5 +119,10 @@ public class SlackManager implements BMObserver {
         // Boolean worked = slackmgr.postMsg2OurChannel(":cry: Benchmark failed");
         Boolean worked = postMsg2OurChannel(msg);
         System.err.println("Returned boolean from sending msg is " + worked);
+    }
+
+    @Override
+    public Boolean isUpdated() {
+        return null;
     }
 }

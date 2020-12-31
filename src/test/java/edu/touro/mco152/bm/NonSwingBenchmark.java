@@ -8,24 +8,10 @@ import java.beans.PropertyChangeListener;
  * own class.
  */
 public class NonSwingBenchmark implements UserInterface{
-
-    // String variable so executeBenchmark() knows which logic method it should run.
-    public String readOrWrite;
     // Boolean variable to determine whether the benchmark is cancelled or not.
-    public boolean progressBool;
+    public boolean progressBool = true;
     // Integer variable in case we need to set isCancelled to false and carry on with logic execution.
-    public int currentProgress;
-
-    /**
-     * Instantiation requires a "read" or "write" string.
-     * @param readOrWrite string to determine read/write
-     */
-    public NonSwingBenchmark(String readOrWrite){
-        this.readOrWrite = readOrWrite;
-        progressBool = true;
-        currentProgress = 0;
-    }
-
+    public int currentProgress = 0;
 
     @Override
     public void registerPropertyChangeListener(PropertyChangeListener listener) {
@@ -37,11 +23,8 @@ public class NonSwingBenchmark implements UserInterface{
      */
     @Override
     public void executeBenchMark() {
-        if(readOrWrite.equals("write")){
-            BenchmarkClient.writeBMLogicNoSwing();
-        }
-        else if(readOrWrite.equals("read")){
-            BenchmarkClient.readBMLogicNoSwing();
+        if(BenchmarkClient.doBMLogic_NoSwing()){
+            System.out.println(" FINISHED EXECUTING BM");
         }
     }
 
@@ -63,9 +46,7 @@ public class NonSwingBenchmark implements UserInterface{
         if(x == 100){
             progressBool = false;
         }
-        else{
-            currentProgress = x;
-        }
+        currentProgress = x;
     }
 
     @Override

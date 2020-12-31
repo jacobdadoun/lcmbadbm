@@ -1,20 +1,20 @@
-package edu.touro.mco152.bm.command;
+package edu.touro.mco152.bm;
 
-import edu.touro.mco152.bm.*;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
-import java.io.File;
-import java.util.Properties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.util.Properties;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ExecutorAndCommandTest {
+public class AppTest {
 
     // Arrange
     NonSwingBenchmark nonSwingBenchmark;
-    BenchmarkClient bmClient;
+    BenchmarkClient bmClientTest;
 
     @BeforeAll
     /**
@@ -52,38 +52,29 @@ public class ExecutorAndCommandTest {
     }
 
     /**
-     * writeCommand tests the boolean return value from BMWriteActionCommandCenter.execute()
+     * tests to initialize the program without gui
      */
     @Test
-    public void writeBMTest(){
-        // Arrange
-        setupDefaultAsPerProperties();
+    public void main_Test(){
+        // - APP
         // Act
-        nonSwingBenchmark = new NonSwingBenchmark("write");
+        setupDefaultAsPerProperties();
         // Assert
-        assertEquals("write", nonSwingBenchmark.readOrWrite);
-        assertTrue(nonSwingBenchmark.progressBool);
-        assertEquals(0, nonSwingBenchmark.currentProgress);
-        // ~ Act Again
-        bmClient = new BenchmarkClient(nonSwingBenchmark);
+        assertTrue(App.writeTest);
+
+        // NonSwingBenchmark implementation of UserInterface.
+        NonSwingBenchmark nonSwingBenchmark = new NonSwingBenchmark();
+        // Test in NonSwingBMTest class.
+        NonSwingBenchMarkTest nonSwingBenchMarkTest = new NonSwingBenchMarkTest();
+        nonSwingBenchMarkTest.nonSwingBMTemp = nonSwingBenchmark;
+        nonSwingBenchMarkTest.test_init();
+
+        // bmClient test "replica" of DiskWorker from main.
+        BenchmarkClient bmClient = new BenchmarkClient(nonSwingBenchmark);
+        // execute bmClient from NonSwingBenchmark
         bmClient.executionDelegate();
+
+
     }
 
-    /**
-     * readCommand tests the boolean return value from BMReadActionCommandCenter.execute()
-     */
-    @Test
-    public void readBMTest(){
-        // Arrange
-        setupDefaultAsPerProperties();
-        // Act
-        nonSwingBenchmark = new NonSwingBenchmark("read");
-        // Assert
-        assertEquals("read", nonSwingBenchmark.readOrWrite);
-        assertTrue(nonSwingBenchmark.progressBool);
-        assertEquals(0, nonSwingBenchmark.currentProgress);
-        // ~ Act Again
-        bmClient = new BenchmarkClient(nonSwingBenchmark);
-        bmClient.executionDelegate();
-    }
 }

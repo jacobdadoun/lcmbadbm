@@ -1,23 +1,24 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.command.BMCommandCenter;
+import edu.touro.mco152.bm.command.BMReadActionCommandCenter;
+import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
+
 /**
  * Run the disk benchmarking as a Swing-compliant thread (only one of these threads can run at
- * once.) Cooperates with Swing to provide and make use of interim and final progress and
- * information, which is also recorded as needed to the persistence store, and log.
+ * once.) Cooperates with UserInterface to provide and make use of interim and final progress and
+ * information, which is also recorded as needed to the the observers, persistence store, and log.
  * <p>
  * Depends on static values that describe the benchmark to be done having been set in App and Gui classes.
  * The DiskRun class is used to keep track of and persist info about each benchmark at a higher level (a run),
  * while the DiskMark class described each iteration's result, which is displayed by the UI as the benchmark run
  * progresses.
  * <p>
- * This class only knows how to do 'read' or 'write' disk benchmarks. It is instantiated in the
- * startBenchmark() method.
+ * This class only knows how to execute 'read' or 'write' disk benchmarks via the CommandExecutor class. It is
+ * instantiated in the startBenchmark() method.
  * <p>
- * This class has one purpose, to provide instructions to run a benchmark. We instantiate this class with an object
- * of type SwingWorker and UserInterface (GUIBenchMark), which will be used in doBMLogic to call instruction to
- * GUIBenchMark::isBenchMarkCancelled, ::executeBenchMark, ::cancelBenchMark, ::publishToGUI and ::provideProgress.
  * Instead of SwingWorker being dependent on DiskWorker (a class with an entirely different responsibility),
- * DiskWorker is now dependent on SwingWorker via an instance type passed in to its constructor.
+ * DiskWorker is now dependent on SwingWorker via a UserInterface type passed in to this classes constructor.
  */
 
 public class DiskWorker {
@@ -28,29 +29,49 @@ public class DiskWorker {
         DiskWorker.userInterface = userInterface;
     }
 
+    /**
+     * Called from App.startBenchmark(), this delegate-execution method will make a call to the
+     * userInterface execute method.
+     */
     public void executionDelegate() {
         userInterface.executeBenchMark();
     }
 
+    /**
+     * Called from App.cancelBenchmark(), this delegate-execution canceller will make a call to the
+     * userInterface cancel method.
+     */
     public void cancelDelegate(Boolean bool) {
         userInterface.cancelBenchMark(bool);
     }
 
+    /**
+     * Called from UserInterface's doInBackground (using SwingWorker) or executeBenchMark (without using SwingWorker)
+     * method. This static method defines the master-plan of running benchmark logic. It puts CommandExecutor to use by
+     * giving it an instance like BMWriteActionCommandCenter and BMReadActionCommandCenter.
+     *
+     * @return a boolean to doInBackground (when using SwingWorker) or to executeBenchMark (when not using SwingWorker).
+     */
     public static Boolean doBMLogic(){
 
+        // bmCommand will be interchangeable with BMWriteActionCommandCenter and BMReadActionCommandCenter
+        BMCommandCenter bmCommand;
         CommandExecutor commandExecutor;
 
         /*
           The GUI allows either a write, read, or both types of BMs to be started. They are done serially. Only now,
-          we call the GUI from the command classes in order to DiskWorker independent of Gui
+          we call the GUI from the command objects.
          */
 
         // Execute, Register and Notify
         if(App.writeTest) {
-            commandExecutor = new CommandExecutor(userInterface, "write");
-            commandExecutor.setDefaultBMParams();
-            if(commandExecutor.executeBMCommandObject()){
-                commandExecutor.notifyCommandObservers();
+            bmCommand = new BMWriteActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
+                    App.blockSequence);
+            commandExecutor = new CommandExecutor(bmCommand);
+
+            commandExecutor.defaultWriteRegistration(bmCommand.getDiskRun());
+            if(commandExecutor.executeLogicDelegate()){
+                commandExecutor.notifyObserversDelegate();
             }
         }
 
@@ -64,12 +85,16 @@ public class DiskWorker {
             userInterface.showMessagePopUp();
         }
 
-        // Execute and Register. Then instantiate for slack and send a message when read is complete and Notify.
+        // Execute and Register. Then instantiate for slack and provide a message when read is complete and Notifies.
         if (App.readTest) {
-            commandExecutor = new CommandExecutor(userInterface, "read");
-            commandExecutor.setDefaultBMParams();
-            if(commandExecutor.executeBMCommandObject()){
-                commandExecutor.notifyCommandObservers();
+
+            bmCommand = new BMReadActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
+                    App.blockSequence);
+            commandExecutor = new CommandExecutor(bmCommand);
+            commandExecutor.defaultReadRegistration(bmCommand.getDiskRun());
+
+            if(commandExecutor.executeLogicDelegate()){
+                commandExecutor.notifyObserversDelegate();
             }
         }
 
