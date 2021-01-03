@@ -56,9 +56,7 @@ public class DiskWorker {
 
         // Execute, Register and Notify
         if(App.writeTest) {
-
             bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-
             executor = new CommandExecutor(bmCommand);
             if(executor.execute()){
                 bmCommand.notifyObservers();
