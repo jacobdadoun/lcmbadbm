@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WriteReadCommandTest {
+public class ExecutorAndCommandTest {
 
     public GUIBenchmark guiBenchmark = new GUIBenchmark();
     public int numOfMark = 50;
