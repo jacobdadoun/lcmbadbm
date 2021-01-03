@@ -10,9 +10,11 @@ import javax.persistence.EntityManager;
 public class DBPersistenceObserver implements BMObserver {
 
     DiskRun diskRun;
+    private Boolean hasBeenUpdated;
 
     public DBPersistenceObserver(DiskRun diskRun){
         this.diskRun = diskRun;
+        hasBeenUpdated = false;
     }
 
     @Override
@@ -21,6 +23,12 @@ public class DBPersistenceObserver implements BMObserver {
         em.getTransaction().begin();
         em.persist(diskRun);
         em.getTransaction().commit();
+        hasBeenUpdated = true;
+    }
+
+    @Override
+    public Boolean isUpdated() {
+        return hasBeenUpdated;
     }
 
 }

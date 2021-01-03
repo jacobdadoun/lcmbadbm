@@ -2,18 +2,19 @@ package edu.touro.mco152.bm;
 
 public class TestObserver implements BMObserver{
 
-    private boolean updateFlag;
+    private boolean hasBeenUpdated;
 
     public TestObserver(){
-        updateFlag = false;
+        hasBeenUpdated = false;
     }
 
     @Override
     public void update() {
-        updateFlag = true;
+        hasBeenUpdated = true;
     }
 
-    public boolean isUpdated(){
-        return updateFlag;
+    @Override
+    public Boolean isUpdated() {
+        return hasBeenUpdated;
     }
 }

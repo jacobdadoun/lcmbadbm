@@ -1,23 +1,20 @@
-package edu.touro.mco152.bm.command;
+package edu.touro.mco152.bm;
 
-import edu.touro.mco152.bm.App;
-import edu.touro.mco152.bm.GUIBenchmark;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
-import java.io.File;
-import java.util.Properties;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.util.Properties;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ExecutorAndCommandTest {
+public class AppTest {
 
-    public GUIBenchmark guiBenchmark = new GUIBenchmark();
-    public int numOfMark = 50;
-    public int numOfBlocks = 64;
-    public int blockSizeKb = 64;
+    // Arrange
+    NonSwingBenchmark nonSwingBenchmark;
+    BenchmarkClient bmClientTest;
 
     @BeforeAll
     /**
@@ -38,7 +35,7 @@ public class ExecutorAndCommandTest {
 
         // code from startBenchmark
         //4. create data dir reference
-        App.dataDir = new File(App.locationDir.getAbsolutePath()+File.separator+App.DATADIRNAME);
+        App.dataDir = new File(App.locationDir.getAbsolutePath() + File.separator + App.DATADIRNAME);
 
         //5. remove existing test data if exist
         if (App.dataDir.exists()) {
@@ -54,23 +51,30 @@ public class ExecutorAndCommandTest {
         }
     }
 
+    /**
+     * tests to initialize the program without gui
+     */
     @Test
-    public void writeCommand(){
+    public void main_Test(){
+        // - APP
+        // Act
         setupDefaultAsPerProperties();
+        // Assert
+        assertTrue(App.writeTest);
 
-        BMWriteActionCommandCenter bmWriteActionCommandCenter = new BMWriteActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
+        // NonSwingBenchmark implementation of UserInterface.
+        NonSwingBenchmark nonSwingBenchmark = new NonSwingBenchmark();
+        // Test in NonSwingBMTest class.
+        NonSwingBenchMarkTest nonSwingBenchMarkTest = new NonSwingBenchMarkTest();
+        nonSwingBenchMarkTest.nonSwingBMTemp = nonSwingBenchmark;
+        nonSwingBenchMarkTest.test_init();
 
-        assertTrue(bmWriteActionCommandCenter.execute());
+        // bmClient test "replica" of DiskWorker from main.
+        BenchmarkClient bmClient = new BenchmarkClient(nonSwingBenchmark);
+        // execute bmClient from NonSwingBenchmark
+        bmClient.executionDelegate();
+
 
     }
 
-    @Test
-    public void readCommand(){
-        setupDefaultAsPerProperties();
-
-        BMReadActionCommandCenter bmReadActionCommandCenter = new BMReadActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
-
-        assertTrue(bmReadActionCommandCenter.execute());
-
-    }
 }
