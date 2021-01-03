@@ -1,12 +1,9 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.*;
-import edu.touro.mco152.bm.persist.DBPersistenceObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.persist.EM;
 import edu.touro.mco152.bm.ui.Gui;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,24 +18,27 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
 
 /**
- * implement our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
+ * This class has one purpose, to provide instructions for writing a benchmark. We instantiate this class with an object
+ * of type SwingWorker and UserInterface (GUIBenchMark), which will be used in doBMLogic to call instruction to
+ * GUIBenchMark::isBenchMarkCancelled, ::executeBenchMark, ::publishToGUI and ::provideProgress.
+ *
+ * Extend our BMCommandCenter to make our writeBM class an object of type BMCommandCenter
  */
-public class BMWriteActionCommandCenter implements BMCommandCenter {
-
-    UserInterface userInterface;
-    int numOfMarks, numOfBlocks, blockSizeKb;
-    DiskRun.BlockSequence blockSequence;
-    DiskRun run;
+public class BMWriteActionCommandCenter extends BMCommandCenter {
 
     public BMWriteActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
-        this.userInterface = userInterface;
-        this.numOfMarks = numOfMarks;
-        this.numOfBlocks = numOfBlocks;
-        this.blockSizeKb = blockSizeKb;
-        this.blockSequence = blockSequence;
+        super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
         run = new DiskRun(DiskRun.IOMode.WRITE, this.blockSequence);
     }
 
+    /**
+     * At the end of the day, execution itself is dependant on one method... this one.
+     * No longer do we reference important data so dependant and 'tightly coupled'. Now,
+     * The essential variables needed will come defined from the client who doesn't mind
+     * being tied down to App.java in order for it to set them independently.
+     *
+     * @return a boolean to an if-statement condition in the CommandExecutor.executeLogicDelegate
+     */
     @Override
     public boolean execute() {
 
@@ -161,11 +161,6 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
             run.setRunAvg(wMark.getCumAvg());
             run.setEndTime(new Date());
         } // END outer loop for specified duration (number of 'marks') for WRITE bench mark
-
-        //Persist info about the Write BM Run (e.g. into Derby Database)
-        DiskWorker.bmSubject.registerObserver(new DBPersistenceObserver(run));
-
-        DiskWorker.bmSubject.registerObserver(new Gui(run));
         return true;
     }
 
@@ -174,6 +169,10 @@ public class BMWriteActionCommandCenter implements BMCommandCenter {
 
     }
 
+    /**
+     * Client should be able to call for a DiskRun when one needed (Observers take DiskRuns as constructor params)
+     * @return the data for a single run.
+     */
     @Override
     public DiskRun getDiskRun() {
         return run;
