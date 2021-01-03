@@ -60,7 +60,7 @@ public class WriteReadCommandTest {
 
         BMWriteActionCommandCenter bmWriteActionCommandCenter = new BMWriteActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
 
-        assertTrue(bmWriteActionCommandCenter.doBMCommand());
+        assertTrue(bmWriteActionCommandCenter.execute());
 
     }
 
@@ -70,7 +70,7 @@ public class WriteReadCommandTest {
 
         BMReadActionCommandCenter bmReadActionCommandCenter = new BMReadActionCommandCenter(guiBenchmark, numOfMark, numOfBlocks, blockSizeKb, App.blockSequence);
 
-        assertTrue(bmReadActionCommandCenter.doBMCommand());
+        assertTrue(bmReadActionCommandCenter.execute());
 
     }
 }
