@@ -1,19 +1,23 @@
-package edu.touro.mco152.bm;
+package edu.touro.mco152.bm.executor;
 
+import edu.touro.mco152.bm.App;
+import edu.touro.mco152.bm.TestObserver;
+import edu.touro.mco152.bm.client.BenchmarkClient;
+import edu.touro.mco152.bm.client.BenchmarkClientTest;
+import edu.touro.mco152.bm.command.BMCommandCenter;
+import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
+import edu.touro.mco152.bm.ui.NonSwingBenchmark;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NonSwingBenchMarkTest {
-
-    public NonSwingBenchmark nonSwingBMTemp = new NonSwingBenchmark();
+public class ExecutorTest {
 
     @BeforeAll
     /**
@@ -51,10 +55,13 @@ public class NonSwingBenchMarkTest {
     }
 
     @Test
-    public void test_init(){
+    public void test_execute(){
         setupDefaultAsPerProperties();
-        assertEquals(nonSwingBMTemp.currentProgress, 0);
-        assertTrue(nonSwingBMTemp.progressBool);
+
+        BMCommandCenter command = new BMWriteActionCommandCenter(new NonSwingBenchmark(), BenchmarkClient.numOfMarks, BenchmarkClient.numOfBlocks, BenchmarkClient.blockSizeKb, BenchmarkClient.blockSequence);
+        TestExecutor executor = new TestExecutor(command);
+        assertTrue(executor.execute());
+        assertTrue(executor.wasExecuted);
     }
 
 }
