@@ -3,6 +3,7 @@ package edu.touro.mco152.bm.ui;
 import edu.touro.mco152.bm.App;
 import edu.touro.mco152.bm.BMObserver;
 import edu.touro.mco152.bm.DiskMark;
+import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.persist.DiskRun;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -33,9 +34,10 @@ public final class Gui implements BMObserver {
     public DiskRun diskRun;
     private Boolean hasBeenUpdated;
 
-    public Gui(DiskRun diskRun){
-        this.diskRun = diskRun;
+    public Gui(BMCommandCenter command){
         hasBeenUpdated = false;
+        this.diskRun = command.getDiskRun();
+        command.registerObserver(this);
     }
 
     public static ChartPanel createChartPanel() {

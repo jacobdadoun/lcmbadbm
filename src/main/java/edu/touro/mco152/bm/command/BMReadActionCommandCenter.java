@@ -23,6 +23,7 @@ public class BMReadActionCommandCenter extends BMCommandCenter {
 
     public BMReadActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
         super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        run = new DiskRun(DiskRun.IOMode.READ, this.blockSequence);
     }
 
     @Override

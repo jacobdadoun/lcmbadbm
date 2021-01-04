@@ -1,6 +1,8 @@
 package edu.touro.mco152.bm.persist;
 
 import edu.touro.mco152.bm.BMObserver;
+import edu.touro.mco152.bm.command.BMCommandCenter;
+
 import javax.persistence.EntityManager;
 
 /**
@@ -12,9 +14,10 @@ public class DBPersistenceObserver implements BMObserver {
     DiskRun diskRun;
     private Boolean hasBeenUpdated;
 
-    public DBPersistenceObserver(DiskRun diskRun){
-        this.diskRun = diskRun;
+    public DBPersistenceObserver(BMCommandCenter command){
         hasBeenUpdated = false;
+        this.diskRun = command.getDiskRun();
+        command.registerObserver(this);
     }
 
     @Override

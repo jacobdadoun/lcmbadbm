@@ -28,6 +28,7 @@ public class BMWriteActionCommandCenter extends BMCommandCenter {
 
     public BMWriteActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
         super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        run = new DiskRun(DiskRun.IOMode.WRITE, this.blockSequence);
     }
 
     /**

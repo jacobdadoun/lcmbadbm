@@ -1,19 +1,21 @@
-package edu.touro.mco152.bm;
+package edu.touro.mco152.bm.ui;
 
+import edu.touro.mco152.bm.App;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
+import edu.touro.mco152.bm.ui.NonSwingBenchmark;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BenchmarkClientTest {
+public class NonSwingBenchMarkTest {
 
-    static BenchmarkClient bmClient;
+    public NonSwingBenchmark nonSwingBMTemp = new NonSwingBenchmark();
 
     @BeforeAll
     /**
@@ -51,25 +53,9 @@ public class BenchmarkClientTest {
     }
 
     @Test
-    public static void checkWriteAndRead(){
-        // Arrange
-        setupDefaultAsPerProperties();
-
-        // Act
-        NonSwingBenchmark nonSwingBenchmark = new NonSwingBenchmark();
-        bmClient = new BenchmarkClient(nonSwingBenchmark);
-
-        // Assert
-        assertFalse(BenchmarkClient.writeTestComplete);
-        assertFalse(BenchmarkClient.readTestComplete);
-
-        // Act
-        bmClient.executionDelegate();
-
-        // Assert
-        assertTrue(BenchmarkClient.writeTestComplete);
-        assertTrue(BenchmarkClient.readTestComplete);
-
+    public void test_init(){
+        assertEquals(nonSwingBMTemp.currentProgress, 0);
+        assertTrue(nonSwingBMTemp.progressBool);
     }
 
 }

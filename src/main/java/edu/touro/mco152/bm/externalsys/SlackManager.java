@@ -7,6 +7,7 @@ import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.api.ApiTestResponse;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import edu.touro.mco152.bm.BMObserver;
+import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.persist.DiskRun;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.io.IOException;
 public class SlackManager implements BMObserver {
     private static Slack slack = null;  // obtain/keep one copy of expensive item
     public DiskRun diskRun;
+    private BMCommandCenter command;
 
     /**
      * Token for use with Slack API, representing info about our bot/app/channel.
@@ -50,9 +52,10 @@ public class SlackManager implements BMObserver {
      *
      * @param appName - pass a sring like BadBM, or whatever name you want to appear in msgs
      */
-    public SlackManager(String appName, DiskRun diskRun) {
+    public SlackManager(String appName,BMCommandCenter command) {
         this.appName = appName;
-        this.diskRun = diskRun;
+        this.diskRun = command.getDiskRun();
+        this.command = command;
 
         if (slack == null)
             slack = Slack.getInstance();
@@ -68,6 +71,7 @@ public class SlackManager implements BMObserver {
             System.err.println("SlackManager: Problem with auto-validation of Slack");
             exc.printStackTrace();
         }
+        this.command.registerObserver(this);
     }
 
     /**
@@ -116,9 +120,13 @@ public class SlackManager implements BMObserver {
 
     @Override
     public void update() {
+        // Put if here for Max speed > 3% of avg speed
+        if(command.getDiskRun().getRunMax() > (command.getDiskRun().getRunAvg() * 0.03)){
+            Boolean worked = postMsg2OurChannel(msg);
+            System.err.println("Returned boolean from sending msg is " + worked);
+        }
         // Boolean worked = slackmgr.postMsg2OurChannel(":cry: Benchmark failed");
-        Boolean worked = postMsg2OurChannel(msg);
-        System.err.println("Returned boolean from sending msg is " + worked);
+
     }
 
     @Override

@@ -33,7 +33,6 @@ public abstract class BMCommandCenter {
         this.numOfBlocks = numOfBlocks;
         this.blockSizeKb = blockSizeKb;
         this.blockSequence = blockSequence;
-        run = new DiskRun(DiskRun.IOMode.WRITE, this.blockSequence);
     }
 
     // Abstracts must be defined in child class

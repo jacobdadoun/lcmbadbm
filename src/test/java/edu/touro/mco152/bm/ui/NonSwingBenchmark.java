@@ -1,4 +1,8 @@
-package edu.touro.mco152.bm;
+package edu.touro.mco152.bm.ui;
+
+import edu.touro.mco152.bm.DiskMark;
+import edu.touro.mco152.bm.UserInterface;
+import edu.touro.mco152.bm.client.BenchmarkClient;
 
 import java.beans.PropertyChangeListener;
 
@@ -7,11 +11,13 @@ import java.beans.PropertyChangeListener;
  * overridden methods are in a gui context, they were defined here to be dependant on resources available to their
  * own class.
  */
-public class NonSwingBenchmark implements UserInterface{
+public class NonSwingBenchmark implements UserInterface {
     // Boolean variable to determine whether the benchmark is cancelled or not.
     public boolean progressBool = true;
     // Integer variable in case we need to set isCancelled to false and carry on with logic execution.
     public int currentProgress = 0;
+
+    public boolean bmFinished = false;
 
     @Override
     public void registerPropertyChangeListener(PropertyChangeListener listener) {
@@ -24,8 +30,13 @@ public class NonSwingBenchmark implements UserInterface{
     @Override
     public void executeBenchMark() {
         if(BenchmarkClient.doBMLogic_NoSwing()){
+            bmFinished = true;
             System.out.println(" FINISHED EXECUTING BM");
         }
+    }
+
+    public Boolean getBMStatus(){
+        return bmFinished;
     }
 
     /**

@@ -1,10 +1,13 @@
-package edu.touro.mco152.bm;
+package edu.touro.mco152.bm.observer;
 
+import edu.touro.mco152.bm.App;
+import edu.touro.mco152.bm.TestObserver;
 import edu.touro.mco152.bm.client.BenchmarkClient;
-import edu.touro.mco152.bm.client.BenchmarkClientTest;
+import edu.touro.mco152.bm.command.BMCommandCenter;
+import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
+import edu.touro.mco152.bm.executor.TestExecutor;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
-import edu.touro.mco152.bm.ui.NonSwingBenchMarkTest;
 import edu.touro.mco152.bm.ui.NonSwingBenchmark;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -12,13 +15,10 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AppTest {
+public class ObserverTest {
 
-    // Arrange
-    NonSwingBenchmark nonSwingBenchmark;
-    BenchmarkClient bmClientTest;
 
     @BeforeAll
     /**
@@ -55,16 +55,21 @@ public class AppTest {
         }
     }
 
-    /**
-     * tests to initialize the program without gui
-     */
     @Test
-    public void main_Test(){
-        // - APP
-        // Act
+    public void test_ObserverForUpdate(){
         setupDefaultAsPerProperties();
-        // Assert
-        assertTrue(App.writeTest);
-    }
 
+        BMCommandCenter command = new BMWriteActionCommandCenter(new NonSwingBenchmark(), BenchmarkClient.numOfMarks, BenchmarkClient.numOfBlocks, BenchmarkClient.blockSizeKb, BenchmarkClient.blockSequence);
+        TestExecutor executor = new TestExecutor(command);
+        // set Observer
+        TestObserver testObserver = new TestObserver(command);
+        command.registerObserver(testObserver);
+        // execute
+        if(executor.execute()){
+            command.notifyObservers(); // call to update all observers
+        }
+        // Assert
+        assertTrue(testObserver.isUpdated());
+
+    }
 }

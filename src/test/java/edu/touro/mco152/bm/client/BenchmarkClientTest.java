@@ -1,25 +1,20 @@
-package edu.touro.mco152.bm;
+package edu.touro.mco152.bm.client;
 
-
+import edu.touro.mco152.bm.App;
+import edu.touro.mco152.bm.ui.NonSwingBenchMarkTest;
+import edu.touro.mco152.bm.ui.NonSwingBenchmark;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ExecutorTest {
-
-    public CommandExecutor commandExecutor;
-
-    public ExecutorTest(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
-    }
+public class BenchmarkClientTest {
 
     @BeforeAll
     /**
@@ -49,24 +44,29 @@ public class ExecutorTest {
             } else {
                 App.msg("unable to remove existing data dir");
             }
-        }
-        else
-        {
+        } else {
             App.dataDir.mkdirs(); // create data dir if not already present
         }
     }
 
     @Test
-    public Boolean test_ifExecuted(){
-        assertTrue(commandExecutor.wasExecuted);
-        return true;
+    public void test_BenchMarkClient(){
+        setupDefaultAsPerProperties();
+        // NonSwingBenchmark implementation of UserInterface.
+        NonSwingBenchmark nonSwingBenchmark = new NonSwingBenchmark();
+        // Test in NonSwingBMTest class.
+        NonSwingBenchMarkTest nonSwingBenchMarkTest = new NonSwingBenchMarkTest();
+        nonSwingBenchMarkTest.nonSwingBMTemp = nonSwingBenchmark;
+        nonSwingBenchMarkTest.test_init();
+
+        // bmClient test "replica" of DiskWorker from main.
+        BenchmarkClient bmClient = new BenchmarkClient(nonSwingBenchmark);
+        // execute bmClient from NonSwingBenchmark
+        bmClient.executionDelegate();
+
+        // Assert
+        assertTrue(nonSwingBenchmark.getBMStatus());
     }
 
-    @AfterAll
-    public void checkListForUpdateBooleans(){
-        ArrayList<BMObserver> listOfObservers = commandExecutor.getObserverDelegate();
-        for(BMObserver observer : listOfObservers){
-            assertTrue(observer.isUpdated());
-        }
-    }
+
 }
