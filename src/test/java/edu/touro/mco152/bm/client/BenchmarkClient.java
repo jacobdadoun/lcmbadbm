@@ -8,6 +8,8 @@ package edu.touro.mco152.bm.client;
 
 import edu.touro.mco152.bm.App;
 import edu.touro.mco152.bm.UserInterface;
+import edu.touro.mco152.bm.builder.CommandValueBuilder;
+import edu.touro.mco152.bm.builder.IBuilder;
 import edu.touro.mco152.bm.executor.AbstractExecutor;
 import edu.touro.mco152.bm.executor.TestExecutor;
 import edu.touro.mco152.bm.command.BMCommandCenter;
@@ -49,8 +51,11 @@ public class BenchmarkClient {
 
     public static boolean doBMLogic_NoSwing(){
 
+        IBuilder builder = new CommandValueBuilder(userInterface).numOfMarks(numOfMarks)
+                .numOfBlocks(numOfBlocks).blockSizeKb(blockSizeKb).blockSequence(blockSequence);
+
         if(App.writeTest){
-            bmCommand = new BMWriteActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+            bmCommand = new BMWriteActionCommandCenter(builder.getRequest());
 
             commandExecutor = new TestExecutor(bmCommand);
             if(commandExecutor.execute()){
@@ -64,7 +69,7 @@ public class BenchmarkClient {
         }
 
         if(App.readTest){
-            bmCommand = new BMReadActionCommandCenter(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+            bmCommand = new BMReadActionCommandCenter(builder.getRequest());
 
             commandExecutor = new TestExecutor(bmCommand);
             if(commandExecutor.execute()){

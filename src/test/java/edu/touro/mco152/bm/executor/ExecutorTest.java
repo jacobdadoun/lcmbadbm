@@ -2,6 +2,8 @@ package edu.touro.mco152.bm.executor;
 
 import edu.touro.mco152.bm.App;
 import edu.touro.mco152.bm.TestObserver;
+import edu.touro.mco152.bm.builder.CommandValueBuilder;
+import edu.touro.mco152.bm.builder.IBuilder;
 import edu.touro.mco152.bm.client.BenchmarkClient;
 import edu.touro.mco152.bm.client.BenchmarkClientTest;
 import edu.touro.mco152.bm.command.BMCommandCenter;
@@ -58,7 +60,11 @@ public class ExecutorTest {
     public void test_execute(){
         setupDefaultAsPerProperties();
 
-        BMCommandCenter command = new BMWriteActionCommandCenter(new NonSwingBenchmark(), BenchmarkClient.numOfMarks, BenchmarkClient.numOfBlocks, BenchmarkClient.blockSizeKb, BenchmarkClient.blockSequence);
+        IBuilder builder = new CommandValueBuilder(new NonSwingBenchmark()).numOfMarks(BenchmarkClient.numOfMarks)
+                .numOfBlocks(BenchmarkClient.numOfBlocks).blockSizeKb(BenchmarkClient.blockSizeKb)
+                .blockSequence(BenchmarkClient.blockSequence);
+
+        BMCommandCenter command = new BMWriteActionCommandCenter(builder.getRequest());
         TestExecutor executor = new TestExecutor(command);
         assertTrue(executor.execute());
         assertTrue(executor.wasExecuted);

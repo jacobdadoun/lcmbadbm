@@ -2,6 +2,7 @@ package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.BMObserver;
 import edu.touro.mco152.bm.UserInterface;
+import edu.touro.mco152.bm.builder.CommandValueRequest;
 import edu.touro.mco152.bm.persist.DiskRun;
 
 import java.util.ArrayList;
@@ -27,12 +28,12 @@ public abstract class BMCommandCenter {
     // variable assigned a message for preliminary status update.
     public String message = "";
 
-    public BMCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
-        this.userInterface = userInterface;
-        this.numOfMarks = numOfMarks;
-        this.numOfBlocks = numOfBlocks;
-        this.blockSizeKb = blockSizeKb;
-        this.blockSequence = blockSequence;
+    public BMCommandCenter(CommandValueRequest commandValueRequest){
+        this.userInterface = commandValueRequest.getUserInterface();
+        this.numOfMarks = commandValueRequest.getNumOfMarks();
+        this.numOfBlocks = commandValueRequest.getNumOfBlocks();
+        this.blockSizeKb = commandValueRequest.getBlockSizeKb();
+        this.blockSequence = commandValueRequest.getBlockSequence();
     }
 
     // Abstracts must be defined in child class

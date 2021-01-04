@@ -1,5 +1,7 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.builder.CommandValueBuilder;
+import edu.touro.mco152.bm.builder.IBuilder;
 import edu.touro.mco152.bm.executor.AbstractExecutor;
 import edu.touro.mco152.bm.executor.ReadExecutor;
 import edu.touro.mco152.bm.executor.WriteExecutor;
@@ -60,6 +62,8 @@ public class DiskWorker {
         // bmCommand will be interchangeable with BMWriteActionCommandCenter and BMReadActionCommandCenter
         BMCommandCenter bmCommand;
         AbstractExecutor commandExecutor;
+        IBuilder builder = new CommandValueBuilder(userInterface).numOfMarks(App.numOfMarks)
+                .numOfBlocks(App.numOfBlocks).blockSizeKb(App.blockSizeKb).blockSequence(App.blockSequence);
 
         /*
           The GUI allows either a write, read, or both types of BMs to be started. They are done serially. Only now,
@@ -68,8 +72,7 @@ public class DiskWorker {
 
         // Execute, Register and Notify
         if(App.writeTest) {
-            bmCommand = new BMWriteActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
-                    App.blockSequence);
+            bmCommand = new BMWriteActionCommandCenter(builder.getRequest());
 
             commandExecutor = new WriteExecutor(bmCommand);
             if(commandExecutor.execute()){
@@ -89,8 +92,7 @@ public class DiskWorker {
 
         // Execute and Register. Then instantiate for slack and provide a message when read is complete and Notifies.
         if (App.readTest) {
-            bmCommand = new BMReadActionCommandCenter(userInterface, App.numOfMarks, App.numOfBlocks, App.blockSizeKb,
-                    App.blockSequence);
+            bmCommand = new BMReadActionCommandCenter(builder.getRequest());
 
             commandExecutor = new ReadExecutor(bmCommand);
             if(commandExecutor.execute()){

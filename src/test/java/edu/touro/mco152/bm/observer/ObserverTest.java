@@ -2,6 +2,8 @@ package edu.touro.mco152.bm.observer;
 
 import edu.touro.mco152.bm.App;
 import edu.touro.mco152.bm.TestObserver;
+import edu.touro.mco152.bm.builder.CommandValueBuilder;
+import edu.touro.mco152.bm.builder.IBuilder;
 import edu.touro.mco152.bm.client.BenchmarkClient;
 import edu.touro.mco152.bm.command.BMCommandCenter;
 import edu.touro.mco152.bm.command.BMWriteActionCommandCenter;
@@ -58,8 +60,11 @@ public class ObserverTest {
     @Test
     public void test_ObserverForUpdate(){
         setupDefaultAsPerProperties();
+        IBuilder builder = new CommandValueBuilder(new NonSwingBenchmark()).numOfMarks(BenchmarkClient.numOfMarks)
+                .numOfBlocks(BenchmarkClient.numOfBlocks).blockSizeKb(BenchmarkClient.blockSizeKb)
+                .blockSequence(BenchmarkClient.blockSequence);
 
-        BMCommandCenter command = new BMWriteActionCommandCenter(new NonSwingBenchmark(), BenchmarkClient.numOfMarks, BenchmarkClient.numOfBlocks, BenchmarkClient.blockSizeKb, BenchmarkClient.blockSequence);
+        BMCommandCenter command = new BMWriteActionCommandCenter(builder.getRequest());
         TestExecutor executor = new TestExecutor(command);
         // set Observer
         TestObserver testObserver = new TestObserver(command);

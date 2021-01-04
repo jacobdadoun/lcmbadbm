@@ -1,6 +1,7 @@
 package edu.touro.mco152.bm.command;
 
 import edu.touro.mco152.bm.*;
+import edu.touro.mco152.bm.builder.CommandValueRequest;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 
@@ -21,8 +22,8 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
  */
 public class BMReadActionCommandCenter extends BMCommandCenter {
 
-    public BMReadActionCommandCenter(UserInterface userInterface, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence){
-        super(userInterface, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+    public BMReadActionCommandCenter(CommandValueRequest commandValueRequest){
+        super(commandValueRequest);
         run = new DiskRun(DiskRun.IOMode.READ, this.blockSequence);
     }
 
