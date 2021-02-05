@@ -36,7 +36,7 @@ public class SlackManager implements BMObserver {
      */
     // This token does not work anymore. (Not so)Thankfully, a classmate merged one to main before I could!
     // Renamed from 'token' -> 'dummyToken'.
-    private final String token = "xoxb-8359216899-1017803038051-sT3T2GJQ4aLZDVHjazQgxC";
+    private final String token = "** USE VALID SLACK TOKEN HERE **";
     /**Ud
      * The channel we will send all our messages to
      */
